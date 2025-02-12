@@ -47,19 +47,30 @@ export class Map extends ex.Actor {
         this.hexWidth = this.size * 3/2;
         this.hexHeight = this.size * Math.sqrt(3);
 
-        this.gridWidth = (cols - 1) * this.hexWidth;
-        this.gridHeight = Math.round((rows - 1.5) * this.hexHeight);
+        this.gridWidth = cols * this.hexWidth;
+        this.gridHeight = rows * this.hexHeight;
     }
 
     override onInitialize(engine: ex.Engine): void {
-        // Calculate offsets to center the grid
-        this.offset = ex.vec((engine.drawWidth - this.gridWidth) / 2, (engine.drawHeight - this.gridHeight) / 2);
 
-        // for (let q = 0; q < cols; q++) {
-        //     for (let r = 0; r < rows; r++) {
-        //         this.spawnTile(q, r);
-        //     }
-        // }
+        if (false) {
+            this.addChild(new ex.Actor({
+                pos: ex.vec(-this.hexWidth/2, -this.hexHeight*0.75),
+                width: this.gridWidth,
+                height: this.gridHeight,
+                color: ex.Color.Blue,
+                anchor: ex.vec(0, 0),
+                z: -10
+            }));
+        }
+
+        if (false) {
+            for (let q = 0; q < this.cols; q++) {
+                for (let r = 0; r < this.rows; r++) {
+                    this.spawnTile(q, r);
+                }
+            }
+        }
 
         this.selectedHexagon = new Hexagon('selected_hex', ex.vec(0, 0), (this.size-this.padding)/2, {
             color: ex.Color.Transparent,
@@ -73,18 +84,36 @@ export class Map extends ex.Actor {
         this.selectedHexagon.graphics.isVisible = false;
         this.addChild(this.selectedHexagon);
 
-        console.log('map initialized', this.cols, this.rows, this.gridWidth, this.gridHeight, this.offset);
+        console.log('map initialized', this.cols, this.rows, this.gridWidth, this.gridHeight);
     }
 
     onClick(worldPos: ex.Vector) {
-        const [q, r] = pixel_to_flat_hex(worldPos.sub(this.offset), this.size);
-        console.log(worldPos, 'HEX', q, r);
-        this.selectedHexagon.graphics.isVisible = true;
-        this.selectedHexagon.pos = hex_to_pixel(q, r, this.size).add(this.offset);
+        const [q, r] = pixel_to_flat_hex(worldPos, this.size);
+        if (!this.isQRInMap(q, r)) {
+            return;
+        }
+        const hexPos = hex_to_pixel(q, r, this.size);
+        console.log('clicked', q, r);
+        if (hexPos.equals(this.selectedHexagon.pos)) {
+            this.selectedHexagon.graphics.isVisible = false;
+            this.selectedHexagon.pos = ex.Vector.Zero;
+        } else {
+            this.selectedHexagon.graphics.isVisible = true;
+            this.selectedHexagon.pos = hexPos;
+        }
+    }
+
+    isPointInMap(worldPos: ex.Vector): boolean {
+        const [q, r] = pixel_to_flat_hex(worldPos, this.size);
+        return this.isQRInMap(q, r);
+    }
+
+    isQRInMap(q: number, r: number): boolean {
+        return q >= 0 && q < this.cols && r >= 0 && r < this.rows;
     }
 
     spawnTile(q: number, r: number): Hexagon {
-        const pos = hex_to_pixel(q, r, this.size).add(this.offset)
+        const pos = hex_to_pixel(q, r, this.size);
         const key = `hex_${q}_${r}`;
         const fogColor = this.random.pickOne(MAP_FOG_COLORS).clone();
         fogColor.a = 0.6;
@@ -98,10 +127,13 @@ export class Map extends ex.Actor {
     }
 
     getTileQR(pos: ex.Vector): [number, number] {
-        return pixel_to_flat_hex(pos.sub(this.offset), this.size);
+        return pixel_to_flat_hex(pos, this.size);
     }
 
     visitTile(actor: ex.Actor, [q, r]: [number, number]) {
+        if (!this.isQRInMap(q, r)) {
+            return;
+        }
         const key = `hex_${q}_${r}`;
         const tile = this.visibleTiles[key];
         if (!tile) {

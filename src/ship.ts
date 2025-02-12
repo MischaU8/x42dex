@@ -7,7 +7,7 @@ type ShipEvents = {
   status: ShipStatusEvent;
   selected: ShipSelectedEvent;
 }
- 
+
 export class ShipStatusEvent extends ex.GameEvent<Ship> {
   constructor(public target: Ship, public status: string) {
     super();
@@ -25,7 +25,7 @@ export class ShipStoppedEvent extends ex.GameEvent<Ship> {
     super();
   }
 }
- 
+
 export const ShipEvents = {
   Status: 'status',
   Selected: 'selected',
@@ -34,10 +34,10 @@ export const ShipEvents = {
 
 export class Ship extends ex.Actor {
   public events = new ex.EventEmitter<ex.ActorEvents & ShipEvents>();
-  
+
   map: Map;
   image: ex.ImageSource;
-  
+
   autopilotEnabled: boolean = false;
   targetPos: ex.Vector = ex.vec(0, 0);
   cargo: number = 0;
@@ -113,7 +113,7 @@ export class Ship extends ex.Actor {
       const distanceToTarget = delta.magnitude;
       const currentSpeed = this.vel.magnitude;
 
-      const leadTime = currentSpeed > 0 ? 
+      const leadTime = currentSpeed > 0 ?
         (distanceToTarget / currentSpeed) * Config.PlayerLeadTime :
         Config.PlayerMinLeadTime;
 
@@ -134,7 +134,7 @@ export class Ship extends ex.Actor {
 
       // Calculate how aligned we are with the target (-1 to 1, where 1 is perfectly aligned)
       const alignment = Math.cos(leadDelta.angleBetween(this.rotation - Math.PI / 2, ex.RotationType.ShortestPath));
-      
+
       const breakingDistance = this.calcBreakingDistance(currentSpeed, Config.PlayerMaxDeceleration);
       const coastingDistance = this.calcBreakingDistance(currentSpeed, Config.PlayerMaxAcceleration);
 
@@ -176,17 +176,17 @@ export class Ship extends ex.Actor {
   }
 
   private _wrap(engine: ex.Engine) {
-    if (this.pos.x < 0) {
-      this.pos.x = this.map.gridWidth;
+    if (this.pos.x < -this.map.hexWidth/2) {
+      this.pos.x += this.map.gridWidth;
     }
-    if (this.pos.x > this.map.gridWidth) {
-      this.pos.x = 0;
+    if (this.pos.x > this.map.gridWidth - this.map.hexWidth/2) {
+      this.pos.x -= this.map.gridWidth;
     }
-    if (this.pos.y < 0) {
-      this.pos.y = this.map.gridHeight;
+    if (this.pos.y < -this.map.hexHeight*0.75) {
+      this.pos.y += this.map.gridHeight;
     }
-    if (this.pos.y > this.map.gridHeight) {
-      this.pos.y = 0;
+    if (this.pos.y > this.map.gridHeight - this.map.hexHeight*0.75) {
+      this.pos.y -= this.map.gridHeight;
     }
   }
 
@@ -202,7 +202,7 @@ export class Ship extends ex.Actor {
     } else {
       this.acc.setTo(0, 0);
     }
-    
+
     if (this.vel.magnitude > 0.01) {
       this.vel = this.vel.scale(Config.VelocityDecay);
     } else {

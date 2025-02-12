@@ -26,8 +26,8 @@ export class MyLevel extends ex.Scene {
 
     override onInitialize(engine: ex.Engine): void {
         // this.add(new Background(this.random, Resources.BackdropBlackLittleSparkBlack.toSprite(), 0.1, this.player));
-        // this.add(new Background(this.random, Resources.Parallax100.toSprite(), 0.01, this.player));
-        // this.add(new Background(this.random, Resources.Parallax80.toSprite(), 0.02, this.player));
+        // this.add(new Background(this.random, Resources.Parallax100.toSprite(), 0.01));
+        // this.add(new Background(this.random, Resources.Parallax80.toSprite(), 0.02));
         this.add(new Background(this.random, Resources.Parallax60.toSprite(), 0.05));
         this.add(new Background(this.random, Resources.BackdropBlackLittleSparkTransparent.toSprite(), 0.1));
         this.add(new Background(this.random, Resources.BackdropBlackLittleSparkTransparent.toSprite(), 0.2));
@@ -35,10 +35,9 @@ export class MyLevel extends ex.Scene {
 
         // return;
         this.add(this.map);
-
         this.add(this.statusLabel);
 
-        this.player.pos = ex.vec(this.map.gridWidth / 2, this.map.gridHeight / 2);
+        this.player.pos = ex.vec(this.map.gridWidth / 2, this.map.gridHeight / 2 - this.map.hexHeight / 2);
         console.log('player pos', this.player.pos);
         this.add(this.player);
 
@@ -64,7 +63,7 @@ export class MyLevel extends ex.Scene {
                 break;
             }
             const astroid = new StaticSpaceObject(`Astroid ${i}`, astroidImage, astroidColor, pos);
-            this.add(astroid);  
+            this.add(astroid);
             this.staticObjects.push(astroid);
         }
 
@@ -94,7 +93,7 @@ export class MyLevel extends ex.Scene {
         engine.input.pointers.primary.on('down', (evt: ex.PointerEvent) => {
             if (evt.button === ex.PointerButton.Left) {
                 this.map.onClick(evt.worldPos);
-            } else if (evt.button === ex.PointerButton.Right) {
+            } else if (evt.button === ex.PointerButton.Right && this.map.isPointInMap(evt.worldPos)) {
                 this.player.orderMoveTo(evt.worldPos);
             }
         });
@@ -130,7 +129,12 @@ export class MyLevel extends ex.Scene {
     private getRandomPosWithMinDistance(minDistance: number = 64, maxAttempts: number = 25): ex.Vector {
         const pos = ex.vec(0, 0)
         for (let i = 0; i < maxAttempts; i++) {
-            pos.setTo(this.random.integer(64, this.map.gridWidth - 64), this.random.integer(64, this.map.gridHeight - 64));
+            pos.setTo(
+                this.random.integer(0, this.map.gridWidth)-this.map.hexWidth/2,
+                this.random.integer(0, this.map.gridHeight)-this.map.hexHeight*0.75);
+            if (!this.map.isPointInMap(pos)) {
+                continue;
+            }
             if (!this.staticObjects.some(obj => obj.pos.distance(pos) < minDistance)) {
                 return pos;
             }

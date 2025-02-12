@@ -11,9 +11,19 @@ const MAP_FOG_COLORS = [
 
 export class Map extends ex.Actor {
     random: ex.Random;
+    cols: number;
+    rows: number;
+
     selectedHexagon!: Hexagon;
     size: number;
     padding: number;
+
+    hexWidth: number;
+    hexHeight: number;
+
+    gridWidth: number;
+    gridHeight: number;
+
     fogTiles: {
         [key: string]: Hexagon;
     } = {};
@@ -21,7 +31,7 @@ export class Map extends ex.Actor {
         [key: string]: Hexagon;
     } = {};
 
-    constructor(random: ex.Random, size: number, padding: number) {
+    constructor(random: ex.Random, cols: number, rows: number, size: number, padding: number) {
         super({
             pos: ex.vec(0, 0),
             color: ex.Color.Black,
@@ -29,48 +39,41 @@ export class Map extends ex.Actor {
         })
 
         this.random = random;
+        this.cols = cols;
+        this.rows = rows;
         this.size = size;
         this.padding = padding;
+
+        this.hexWidth = this.size * 3/2;
+        this.hexHeight = this.size * Math.sqrt(3);
+
+        this.gridWidth = (cols - 1) * this.hexWidth;
+        this.gridHeight = Math.round((rows - 1.5) * this.hexHeight);
     }
 
     override onInitialize(engine: ex.Engine): void {
-        // draw a hex grid
-        const hexWidth = this.size * 3/2;
-        const hexHeight = this.size * Math.sqrt(3);
-
-        const cols = Math.floor(engine.drawWidth / (hexWidth + this.padding));
-        const rows = Math.floor(engine.drawHeight / (hexHeight + this.padding));
-
-        // Calculate total grid dimensions
-        const gridWidth = (cols - 1) * hexWidth;
-        const gridHeight = (rows - 1.5) * hexHeight;
-        
         // Calculate offsets to center the grid
-        this.offset = ex.vec((engine.drawWidth - gridWidth) / 2, (engine.drawHeight - gridHeight) / 2);
+        this.offset = ex.vec((engine.drawWidth - this.gridWidth) / 2, (engine.drawHeight - this.gridHeight) / 2);
 
-        for (let q = 0; q < cols; q++) {
-            for (let r = 0; r < rows; r++) {
-                const pos = hex_to_pixel(q, r, this.size).add(this.offset)
-                const key = `hex_${q}_${r}`;
-                const fogColor = this.random.pickOne(MAP_FOG_COLORS).clone();
-                fogColor.a = 0.4;
-                const hexagon = new Hexagon(key, pos, (this.size-this.padding)/2, {
-                    color: fogColor,
-                    roundPoints: true,
-                });
-                this.addChild(hexagon);
-                this.fogTiles[key] = hexagon;
-            }
-        }
+        // for (let q = 0; q < cols; q++) {
+        //     for (let r = 0; r < rows; r++) {
+        //         this.spawnTile(q, r);
+        //     }
+        // }
 
         this.selectedHexagon = new Hexagon('selected_hex', ex.vec(0, 0), (this.size-this.padding)/2, {
             color: ex.Color.Transparent,
             strokeColor: ex.Color.Yellow,
             lineWidth: 2,
             roundPoints: true,
+            padding: 2,
+            quality: 2
         });
+        this.selectedHexagon.z = 5;
         this.selectedHexagon.graphics.isVisible = false;
         this.addChild(this.selectedHexagon);
+
+        console.log('map initialized', this.cols, this.rows, this.gridWidth, this.gridHeight, this.offset);
     }
 
     onClick(worldPos: ex.Vector) {
@@ -80,17 +83,29 @@ export class Map extends ex.Actor {
         this.selectedHexagon.pos = hex_to_pixel(q, r, this.size).add(this.offset);
     }
 
-    visitTile(playerPos: ex.Vector) {
-        const [q, r] = pixel_to_flat_hex(playerPos.sub(this.offset), this.size);
+    spawnTile(q: number, r: number): Hexagon {
+        const pos = hex_to_pixel(q, r, this.size).add(this.offset)
         const key = `hex_${q}_${r}`;
-        const tile = this.fogTiles[key];
-        if (tile) {
-            const color = tile.polygon.color.clone();
-            color.a = 0.6;
-            tile.polygon.color = color;
-            // tile.polygon.strokeColor = ex.Color.DarkGray.darken(0.5);
-            // tile.polygon.lineWidth = 1;
-            delete this.fogTiles[key];
+        const fogColor = this.random.pickOne(MAP_FOG_COLORS).clone();
+        fogColor.a = 0.6;
+        const hexagon = new Hexagon(key, pos, (this.size-this.padding)/2, {
+            color: fogColor,
+            roundPoints: true,
+        });
+        // hexagon.graphics.isVisible = false;
+        this.addChild(hexagon);
+        return hexagon;
+    }
+
+    getTileQR(pos: ex.Vector): [number, number] {
+        return pixel_to_flat_hex(pos.sub(this.offset), this.size);
+    }
+
+    visitTile(actor: ex.Actor, [q, r]: [number, number]) {
+        const key = `hex_${q}_${r}`;
+        const tile = this.visibleTiles[key];
+        if (!tile) {
+            this.visibleTiles[key] = this.spawnTile(q, r);
         }
     }
 }

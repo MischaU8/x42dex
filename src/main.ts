@@ -35,7 +35,7 @@ game.input.pointers.primary.on('move', (e) => {
 
 game.input.pointers.primary.on('wheel', (wheelEvent) => {
     // wheel up
-    game.currentScene.camera.pos = currentPointer;
+    // game.currentScene.camera.pos = currentPointer;
     if (wheelEvent.deltaY < 0) {
       game.currentScene.camera.zoom *= 1.05;
     } else {

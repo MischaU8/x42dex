@@ -8,7 +8,7 @@ import { Resources } from "./resources";
 export class MyLevel extends ex.Scene {
     random = new ex.Random(42);
     map = new Map(this.random, 48, 1);
-    player = new Player(Resources.ShipA, ex.Color.Green, this.map);
+    player = new Player(Resources.ShipF, ex.Color.Green, this.map);
     staticObjects: StaticSpaceObject[] = [];
 
     override onInitialize(engine: ex.Engine): void {
@@ -32,17 +32,21 @@ export class MyLevel extends ex.Scene {
             const pos = this.getRandomPosWithMinDistance();
             if (pos.equals(ex.Vector.Zero)) {
                 console.log('Failed to get a valid position for station', i);
-                continue;
+                break;
             }
             const station = new StaticSpaceObject(`Station ${i}`, stationImage, stationColor, pos);
             this.add(station);
             this.staticObjects.push(station);
         }
 
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 25; i++) {
             const astroidImage = this.random.pickOne([Resources.AstroidA, Resources.AstroidB, Resources.AstroidC, Resources.AstroidD, Resources.AstroidE, Resources.AstroidF, Resources.AstroidG, Resources.AstroidH]);
             const astroidColor = this.random.pickOne([ex.Color.Brown, ex.Color.Gray]);
             const pos = this.getRandomPosWithMinDistance();
+            if (pos.equals(ex.Vector.Zero)) {
+                console.log('Failed to get a valid position for astroid', i);
+                break;
+            }
             const astroid = new StaticSpaceObject(`Astroid ${i}`, astroidImage, astroidColor, pos);
             this.add(astroid);  
             this.staticObjects.push(astroid);

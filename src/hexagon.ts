@@ -32,4 +32,4 @@ export class Hexagon extends ex.Actor {
         });
         this.graphics.use(this.polygon);
     }
-  }
+}

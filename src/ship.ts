@@ -71,7 +71,8 @@ export class Ship extends ex.Actor {
     this.graphics.material = material;
 
     this.on('pointerdown', evt => {
-      console.log('You clicked the actor @', evt.worldPos.toString());
+      evt.cancel();
+      console.log(`You clicked the ship ${this.name} @${evt.worldPos.toString()}`);
       this.events.emit(ShipEvents.Selected, new ShipSelectedEvent(this));
     });
   }

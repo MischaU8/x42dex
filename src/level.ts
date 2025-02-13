@@ -92,9 +92,12 @@ export class MyLevel extends ex.Scene {
         engine.currentScene.camera.pos = this.player.pos;
 
         engine.input.pointers.primary.on('down', (evt: ex.PointerEvent) => {
+            if (!this.map.isPointInMap(evt.worldPos)) {
+                return;
+            }
             if (evt.button === ex.PointerButton.Left) {
                 this.map.onClick(evt.worldPos);
-            } else if (evt.button === ex.PointerButton.Right && this.map.isPointInMap(evt.worldPos)) {
+            } else if (evt.button === ex.PointerButton.Right) {
                 this.player.orderMoveTo(evt.worldPos);
             }
         });

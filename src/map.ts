@@ -34,8 +34,7 @@ export class Map extends ex.Actor {
     constructor(random: ex.Random, cols: number, rows: number, size: number, padding: number) {
         super({
             pos: ex.vec(0, 0),
-            color: ex.Color.Black,
-            z: -10
+            z: 0
         })
 
         this.random = random;
@@ -54,14 +53,23 @@ export class Map extends ex.Actor {
     override onInitialize(engine: ex.Engine): void {
 
         if (false) {
-            this.addChild(new ex.Actor({
+            const grid = new ex.Actor({
                 pos: ex.vec(-this.hexWidth/2, -this.hexHeight*0.75),
                 width: this.gridWidth,
                 height: this.gridHeight,
-                color: ex.Color.Blue,
+                color: ex.Color.Transparent,
                 anchor: ex.vec(0, 0),
                 z: -10
-            }));
+            });
+            this.addChild(grid);
+
+            grid.on('pointerdown', evt => {
+                console.log('map pointerdown', evt);
+                if (evt instanceof ex.PointerEvent && evt.button === ex.PointerButton.Left) {
+                    evt.cancel();
+                    this.onClick(evt.worldPos);
+                }
+            });
         }
 
         if (false) {
@@ -93,7 +101,7 @@ export class Map extends ex.Actor {
             return;
         }
         const hexPos = hex_to_pixel(q, r, this.size);
-        console.log('clicked', q, r);
+        console.log('map clicked', q, r);
         if (hexPos.equals(this.selectedHexagon.pos)) {
             this.selectedHexagon.graphics.isVisible = false;
             this.selectedHexagon.pos = ex.Vector.Zero;

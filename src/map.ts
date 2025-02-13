@@ -95,6 +95,16 @@ export class Map extends ex.Actor {
         console.log('map initialized', this.cols, this.rows, this.gridWidth, this.gridHeight);
     }
 
+    deselectHexagon() {
+        this.selectedHexagon.graphics.isVisible = false;
+        this.selectedHexagon.pos = ex.Vector.Zero;
+    }
+
+    selectHexagon(hexPos: ex.Vector) {
+        this.selectedHexagon.graphics.isVisible = true;
+        this.selectedHexagon.pos = hexPos;
+    }
+
     onClick(worldPos: ex.Vector) {
         const [q, r] = pixel_to_flat_hex(worldPos, this.size);
         if (!this.isQRInMap(q, r)) {
@@ -103,11 +113,9 @@ export class Map extends ex.Actor {
         const hexPos = hex_to_pixel(q, r, this.size);
         console.log('map clicked', q, r);
         if (hexPos.equals(this.selectedHexagon.pos)) {
-            this.selectedHexagon.graphics.isVisible = false;
-            this.selectedHexagon.pos = ex.Vector.Zero;
+            this.deselectHexagon();
         } else {
-            this.selectedHexagon.graphics.isVisible = true;
-            this.selectedHexagon.pos = hexPos;
+            this.selectHexagon(hexPos);
         }
     }
 

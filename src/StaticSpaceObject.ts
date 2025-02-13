@@ -1,23 +1,11 @@
 import * as ex from "excalibur";
 import { ColorizeGLSL } from "./materials";
 import { Config } from "./config";
+import * as gev from "./gameevents";
 
-type StaticSpaceObjectEvents = {
-  selected: StaticSpaceObjectSelectedEvent;
-}
-
-export class StaticSpaceObjectSelectedEvent extends ex.GameEvent<StaticSpaceObject> {
-  constructor(public target: StaticSpaceObject) {
-    super();
-  }
-}
-
-export const StaticSpaceObjectEvents = {
-  Selected: 'selected',
-} as const;
 
 export class StaticSpaceObject extends ex.Actor {
-  public events = new ex.EventEmitter<ex.ActorEvents & StaticSpaceObjectEvents>();
+  public events = new ex.EventEmitter<ex.ActorEvents & gev.MyActorEvents>();
 
   image: ex.ImageSource;
 
@@ -48,7 +36,15 @@ export class StaticSpaceObject extends ex.Actor {
     this.on('pointerdown', evt => {
       evt.cancel();
       console.log(`You clicked the object ${this.name} @${evt.worldPos.toString()}`);
-      this.events.emit(StaticSpaceObjectEvents.Selected, new StaticSpaceObjectSelectedEvent(this));
+      this.events.emit(gev.MyActorEvents.Selected, new gev.ActorSelectedEvent(this));
     });
+  }
+
+  public select() {
+    this.graphics.material!.color = ex.Color.Yellow;
+  }
+
+  public deselect() {
+    this.graphics.material!.color = this.color;
   }
 }

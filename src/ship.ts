@@ -50,9 +50,12 @@ export class Ship extends ex.Actor {
     this.on('pointerdown', evt => {
       evt.cancel();
       console.log(`You clicked the ship ${this.name} @${evt.worldPos.toString()}`);
-      this.graphics.material!.color = ex.Color.Yellow;
       this.events.emit(gev.MyActorEvents.Selected, new gev.ActorSelectedEvent(this));
     });
+  }
+
+  public select() {
+    this.graphics.material!.color = ex.Color.Yellow;
   }
 
   public deselect() {

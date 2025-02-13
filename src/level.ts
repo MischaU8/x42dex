@@ -67,7 +67,7 @@ export class MyLevel extends ex.Scene {
         this.add(this.player);
 
         this.player.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
-            this.onSelectedActor(evt.target);
+            this.onSelectShip(evt.target as Ship);
         });
 
         this.player.events.on(gev.ShipEvents.Status, (evt: gev.ShipStatusEvent) => {
@@ -106,6 +106,9 @@ export class MyLevel extends ex.Scene {
                     this.setStatusLabel('GAME PAUSED');
                     this.pausableMotionSystem.paused = true;
                 }
+            } else if (evt.key === ex.Keys.Escape) {
+                this.deselectAny();
+                this.selectedActor = null;
             }
         });
     }
@@ -132,7 +135,7 @@ export class MyLevel extends ex.Scene {
             });
 
             ship.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
-                this.onSelectActor(evt.target);
+                this.onSelectShip(evt.target as Ship);
             });
         }
     }
@@ -151,7 +154,7 @@ export class MyLevel extends ex.Scene {
             this.staticObjects.push(astroid);
 
             astroid.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
-                this.onSelectActor(evt.target);
+                this.onSelectAstroid(evt.target as StaticSpaceObject);
             });
         }
     }
@@ -170,18 +173,67 @@ export class MyLevel extends ex.Scene {
             this.staticObjects.push(station);
 
             station.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
-                this.onSelectActor(evt.target);
+                this.onSelectStation(evt.target as StaticSpaceObject);
             });
         }
     }
 
-    private onSelectActor(actor: ex.Actor) {
-        console.log('Selected actor', actor.name);
-        if (this.selectedActor && this.selectedActor !== actor && this.selectedActor instanceof Ship) {
-            (this.selectedActor as Ship).deselect();
+    private deselectAny() {
+        this.map.deselectHexagon();
+        if (this.selectedActor) {
+            if (this.selectedActor instanceof Ship) {
+                (this.selectedActor as Ship).deselect();
+            } else if (this.selectedActor instanceof StaticSpaceObject) {
+                (this.selectedActor as StaticSpaceObject).deselect();
+            } else {
+                console.error('Unknown actor type', this.selectedActor);
+            }
         }
-        this.selectedActor = actor;
-        this.setStatusLabel(`Selected ${actor.name}`);
+    }
+
+    private onSelectAstroid(astroid: StaticSpaceObject) {
+        this.deselectAny();
+        if (this.selectedActor === astroid) {
+            this.selectedActor = null;
+            console.log('Deselected astroid', astroid.name);
+            this.setStatusLabel(`Deselected ${astroid.name}`);
+            astroid.deselect();
+        } else {
+            this.selectedActor = astroid;
+            console.log('Selected astroid', astroid.name);
+            this.setStatusLabel(`Selected ${astroid.name}`);
+            astroid.select();
+        }
+    }
+
+    private onSelectStation(station: StaticSpaceObject) {
+        this.deselectAny();
+        if (this.selectedActor === station) {
+            this.selectedActor = null;
+            console.log('Deselected station', station.name);
+            this.setStatusLabel(`Deselected ${station.name}`);
+            station.deselect();
+        } else {
+            this.selectedActor = station;
+            console.log('Selected station', station.name);
+            this.setStatusLabel(`Selected ${station.name}`);
+            station.select();
+        }
+    }
+
+    private onSelectShip(ship: Ship) {
+        this.deselectAny();
+        if (this.selectedActor === ship) {
+            this.selectedActor = null;
+            console.log('Deselected ship', ship.name);
+            this.setStatusLabel(`Deselected ${ship.name}`);
+            ship.deselect();
+        } else {
+            this.selectedActor = ship;
+            console.log('Selected ship', ship.name);
+            this.setStatusLabel(`Selected ${ship.name}`);
+            ship.select();
+        }
     }
 
     private shipAutoMine(ship: Ship) {

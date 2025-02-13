@@ -1,8 +1,6 @@
 import * as ex from "excalibur";
 import { Ship } from "./ship";
 
-
-
 export type MyActorEvents = {
   selected: ActorSelectedEvent;
 }
@@ -17,6 +15,7 @@ export const MyActorEvents = {
   Selected: 'selected',
 } as const;
 
+/* ShipEvents */
 
 export type ShipEvents = {
   status: ShipStatusEvent;

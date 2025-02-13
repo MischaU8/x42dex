@@ -1,4 +1,5 @@
 import * as ex from "excalibur";
+import { Config } from "./config";
 import { Player } from "./player";
 import { Ship, ShipEvents, ShipStatusEvent } from "./ship";
 import { StaticSpaceObject } from "./StaticSpaceObject";
@@ -7,8 +8,8 @@ import { Background } from "./background";
 import { Resources } from "./resources";
 
 export class MyLevel extends ex.Scene {
-    random = new ex.Random(42);
-    map = new Map(this.random, 20, 11, 48, 1);
+    random = new ex.Random(Config.Seed);
+    map = new Map(this.random, Config.MapCols, Config.MapRows, Config.MapSize, Config.MapPadding);
     player = new Player('Player', Resources.ShipF, ex.Color.Green, this.map);
     staticObjects: StaticSpaceObject[] = [];
     selectedPlayer: Player | null = null;
@@ -19,7 +20,7 @@ export class MyLevel extends ex.Scene {
         z: 1,
         coordPlane: ex.CoordPlane.Screen,
         font: new ex.Font({
-            size: 20,
+            size: Config.FontSize,
             color: ex.Color.White
         })
     });
@@ -41,7 +42,7 @@ export class MyLevel extends ex.Scene {
         console.log('player pos', this.player.pos);
         this.add(this.player);
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < Config.NumStations; i++) {
             const stationImage = this.random.pickOne([Resources.StationA, Resources.StationB]);
             const stationColor = this.random.pickOne([ex.Color.ExcaliburBlue, ex.Color.Vermilion]);
             const pos = this.getRandomPosWithMinDistance();
@@ -54,7 +55,7 @@ export class MyLevel extends ex.Scene {
             this.staticObjects.push(station);
         }
 
-        for (let i = 0; i < 25; i++) {
+        for (let i = 0; i < Config.NumAstroids; i++) {
             const astroidImage = this.random.pickOne([Resources.AstroidA, Resources.AstroidB, Resources.AstroidC, Resources.AstroidD, Resources.AstroidE, Resources.AstroidF, Resources.AstroidG, Resources.AstroidH]);
             const astroidColor = this.random.pickOne([ex.Color.Brown, ex.Color.Gray]);
             const pos = this.getRandomPosWithMinDistance();
@@ -67,7 +68,7 @@ export class MyLevel extends ex.Scene {
             this.staticObjects.push(astroid);
         }
 
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < Config.NumShips; i++) {
             const shipImage = this.random.pickOne([Resources.ShipA, Resources.ShipB, Resources.ShipC, Resources.ShipD, Resources.ShipE]);
             const shipColor = this.random.pickOne([ex.Color.Magenta, ex.Color.Orange, ex.Color.Violet, ex.Color.Red]);
             const pos = this.getRandomPosWithMinDistance();
@@ -111,7 +112,7 @@ export class MyLevel extends ex.Scene {
             targetName = 'Astroid';
         } else {
             // console.log('Ship', ship.name, 'stopped at astroid');
-            ship.cargo = 100;
+            ship.cargo = Config.MaxCargo;
             targetName = 'Station';
         }
         ship.orderMoveTo(this.getRandomStaticObjectWithPrefix(targetName).pos);

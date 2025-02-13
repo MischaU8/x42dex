@@ -140,7 +140,7 @@ export class Ship extends ex.Actor {
 
       var maxVelocity = this.calcMaxVelocity(distanceToTarget, alignment);
 
-      if (distanceToTarget < 16) {
+      if (distanceToTarget < Config.AutoPilotStoppingDistance) {
         // console.log('stopping')
         this.orderStop();
       } else if (distanceToTarget < breakingDistance || currentSpeed > maxVelocity) {
@@ -160,10 +160,10 @@ export class Ship extends ex.Actor {
   }
 
   private calcMaxVelocity(distanceToTarget: number, alignment: number) {
-    if (distanceToTarget < 8) {
+    if (distanceToTarget < Config.AutoPilotStoppingDistance) {
       return 0;
     } else if (alignment < 0) {
-      return Config.PlayerMaxVelocity * 0.05;
+      return Config.PlayerMaxVelocity * Config.AutoPilotAlignmentVelocityFactor;
     } else {
       return Config.PlayerMaxVelocity * alignment;
     }

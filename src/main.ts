@@ -1,11 +1,13 @@
 import * as ex from "excalibur";
 import { loader } from "./resources";
 import { MyLevel } from "./level";
+import { Config } from "./config";
 
 // Goal is to keep main.ts small and just enough to configure the engine
 
 const game = new ex.Engine({
   backgroundColor: ex.Color.Black,
+  canvasElementId: 'game',
   displayMode: ex.DisplayMode.FillScreen, // Display mode tells excalibur how to fill the window
   pointerScope: ex.PointerScope.Document,
   suppressPlayButton: true,
@@ -37,15 +39,15 @@ game.input.pointers.primary.on('wheel', (wheelEvent) => {
     // wheel up
     // game.currentScene.camera.pos = currentPointer;
     if (wheelEvent.deltaY < 0) {
-      game.currentScene.camera.zoom *= 1.05;
+      game.currentScene.camera.zoom *= Config.ZoomWheelFactor;
     } else {
-      game.currentScene.camera.zoom /= 1.05;
+      game.currentScene.camera.zoom /= Config.ZoomWheelFactor;
     }
 });
 
 game.start('start', { // name of the start scene 'start'
   loader, // Optional loader (but needed for loading images/sounds)
 }).then(() => {
-  game.currentScene.camera.zoom = 2;
+  game.currentScene.camera.zoom = Config.InitialZoom;
   currentPointer = game.currentScene.camera.pos;
 });

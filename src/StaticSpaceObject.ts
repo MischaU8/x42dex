@@ -1,5 +1,7 @@
 import * as ex from "excalibur";
 import { ColorizeGLSL } from "./materials";
+import { Config } from "./config";
+
 export class StaticSpaceObject extends ex.Actor {
   image: ex.ImageSource;
 
@@ -7,8 +9,8 @@ export class StaticSpaceObject extends ex.Actor {
     super({
       name,
       pos,
-      width: 32,
-      height: 32,
+      width: Config.StaticSpaceObjectWidth,
+      height: Config.StaticSpaceObjectHeight,
       color,
     });
     this.image = image;
@@ -16,8 +18,8 @@ export class StaticSpaceObject extends ex.Actor {
 
   override onInitialize(engine: ex.Engine) {
     this.graphics.add(this.image.toSprite({destSize: {
-      width: 32,
-      height: 32,
+      width: Config.StaticSpaceObjectWidth,
+      height: Config.StaticSpaceObjectHeight,
     }}));
 
     const material = engine.graphicsContext.createMaterial({

@@ -1,15 +1,16 @@
 import * as ex from "excalibur";
 
+import * as gev from "./gameevents";
+
+import { ActorDetailsLabel } from "./ActorDetailsLabel";
+import { Background } from "./background";
 import { Config } from "./config";
+import { Map } from "./map";
+import { PausableMotionSystem } from "./PausableMotionSystem";
 import { Player } from "./player";
+import { Resources } from "./resources";
 import { Ship } from "./ship";
 import { StaticSpaceObject } from "./StaticSpaceObject";
-import { Map } from "./map";
-import { Background } from "./background";
-import { Resources } from "./resources";
-import { KeyEvent } from "excalibur";
-import { PausableMotionSystem } from "./PausableMotionSystem";
-import * as gev from "./gameevents";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
@@ -22,26 +23,17 @@ export class MyLevel extends ex.Scene {
     following = false;
     statusLabel = new ex.Label({
         text: '',
-        x: 0,
-        y: 0,
+        x: 10,
+        y: 10,
         z: 1,
         coordPlane: ex.CoordPlane.Screen,
         font: new ex.Font({
+            family: 'monospace',
             size: Config.FontSize,
             color: ex.Color.White
         })
     });
-    detailLabel = new ex.Label({
-        text: 'Details',
-        x: 400,
-        y: 0,
-        z: 1,
-        coordPlane: ex.CoordPlane.Screen,
-        font: new ex.Font({
-            size: Config.FontSize,
-            color: ex.Color.White
-        })
-    });
+    actorDetails = new ActorDetailsLabel();
 
     override onInitialize(engine: ex.Engine): void {
         // replace the default motion system with a pausable one
@@ -52,7 +44,8 @@ export class MyLevel extends ex.Scene {
 
         this.add(this.map);
         this.add(this.statusLabel);
-        this.add(this.detailLabel);
+        this.actorDetails.pos.setTo(10, engine.screen.drawHeight-172);
+        this.add(this.actorDetails);
         this.spawnPlayer(engine);
         this.spawnStations();
         this.spawnAstroids();
@@ -97,13 +90,13 @@ export class MyLevel extends ex.Scene {
             }
         });
 
-        engine.input.keyboard.on("press", (evt: KeyEvent) => {
+        engine.input.keyboard.on("press", (evt: ex.KeyEvent) => {
             if (evt.key === ex.Keys.Space) {
                 if (this.pausableMotionSystem.paused) {
-                    this.setStatusLabel('GAME RESUMED', 1000);
+                    this.setStatusLabel('GAME RESUMED');
                     this.pausableMotionSystem.paused = false;
                 } else {
-                    this.setStatusLabel('GAME PAUSED');
+                    this.setStatusLabel('GAME PAUSED', 0);
                     this.pausableMotionSystem.paused = true;
                 }
             } else if (evt.key === ex.Keys.Escape) {
@@ -190,6 +183,7 @@ export class MyLevel extends ex.Scene {
 
     private deselectAny() {
         this.map.deselectHexagon();
+        this.actorDetails.resetTarget();
         if (this.selectedActor) {
             if (this.selectedActor instanceof Ship) {
                 (this.selectedActor as Ship).deselect();
@@ -213,6 +207,7 @@ export class MyLevel extends ex.Scene {
             console.log('Selected astroid', astroid.name);
             this.setStatusLabel(`Selected ${astroid.name}`);
             astroid.select();
+            this.actorDetails.setTarget(astroid);
         }
     }
 
@@ -228,6 +223,7 @@ export class MyLevel extends ex.Scene {
             console.log('Selected station', station.name);
             this.setStatusLabel(`Selected ${station.name}`);
             station.select();
+            this.actorDetails.setTarget(station);
         }
     }
 
@@ -243,6 +239,7 @@ export class MyLevel extends ex.Scene {
             console.log('Selected ship', ship.name);
             this.setStatusLabel(`Selected ${ship.name}`);
             ship.select();
+            this.actorDetails.setTarget(ship);
         }
     }
 
@@ -260,7 +257,7 @@ export class MyLevel extends ex.Scene {
         ship.orderMoveTo(this.getRandomStaticObjectWithPrefix(targetName).pos);
     }
 
-    private setStatusLabel(status: string, duration: number = 0) {
+    private setStatusLabel(status: string, duration: number = 1000) {
         this.statusLabel.text = status;
         if (duration > 0) {
             this.engine.clock.schedule(() => {

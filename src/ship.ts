@@ -54,6 +54,17 @@ export class Ship extends ex.Actor {
     });
   }
 
+  public getDetails() {
+    return `[${this.name}]
+  hex ${this.tileQR[0]},${this.tileQR[1]}
+angle ${(this.rotation * 180 / Math.PI).toFixed(0).padStart(3, "0")}°
+  vel ${this.vel.magnitude.toFixed(0).padStart(3, "0")}m/s
+  acc ${this.acc.magnitude.toFixed(0).padStart(3, "0")}m/s²
+cargo ${this.cargo.toFixed(0).padStart(3, "0")}
+ auto ${this.autopilotEnabled?'on':'off'}
+ goto ${this.autopilotEnabled?`${this.targetPos.x.toFixed(0)},${this.targetPos.y.toFixed(0)}`:"---"}`;
+  }
+
   public select() {
     this.graphics.material!.color = ex.Color.Yellow;
   }

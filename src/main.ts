@@ -21,6 +21,7 @@ let down = false;
 game.input.pointers.primary.on('down', (e) => {
     currentPointer = e.worldPos;
     down = true;
+    game.currentScene.camera.clearAllStrategies();
 });
 game.input.pointers.primary.on('up', (e) => {
     down = false;

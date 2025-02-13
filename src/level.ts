@@ -19,6 +19,7 @@ export class MyLevel extends ex.Scene {
     pausableMotionSystem = new PausableMotionSystem(this.world, this.physics);
 
     selectedActor: ex.Actor | null = null;
+    following = false;
     statusLabel = new ex.Label({
         text: '',
         x: 0,
@@ -63,7 +64,6 @@ export class MyLevel extends ex.Scene {
     private spawnPlayer(engine: ex.Engine<any>) {
         this.player.pos = ex.vec(this.map.gridWidth / 2, this.map.gridHeight / 2 - this.map.hexHeight / 2);
         engine.currentScene.camera.pos = this.player.pos;
-        console.log('player pos', this.player.pos);
         this.add(this.player);
 
         this.player.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
@@ -109,6 +109,16 @@ export class MyLevel extends ex.Scene {
             } else if (evt.key === ex.Keys.Escape) {
                 this.deselectAny();
                 this.selectedActor = null;
+            } else if (evt.key === ex.Keys.F) {
+                if (this.following) {
+                    this.engine.currentScene.camera.clearAllStrategies();
+                    this.setStatusLabel('Unfollowing', 1000);
+                    this.following = false;
+                } else if (this.selectedActor instanceof Ship) {
+                    this.engine.currentScene.camera.strategy.lockToActor(this.selectedActor as Ship);
+                    this.setStatusLabel(`Following ${this.selectedActor.name}`, 1000);
+                    this.following = true;
+                }
             }
         });
     }

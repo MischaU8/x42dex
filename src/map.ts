@@ -91,8 +91,6 @@ export class Map extends ex.Actor {
         // this.selectedHexagon.z = 0;
         this.selectedHexagon.graphics.isVisible = false;
         this.addChild(this.selectedHexagon);
-
-        console.log('map initialized', this.cols, this.rows, this.gridWidth, this.gridHeight);
     }
 
     deselectHexagon() {

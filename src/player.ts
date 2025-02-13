@@ -33,11 +33,11 @@ export class Player extends Ship {
     }
 
     if (engine.input.keyboard.isHeld(ex.Keys.D) ||
-      engine.input.keyboard.isHeld(ex.Keys.Right)) { 
+      engine.input.keyboard.isHeld(ex.Keys.Right)) {
       this.rotateRight();
     }
 
-    if (engine.input.keyboard.isHeld(ex.Keys.Space)) {
+    if (engine.input.keyboard.isHeld(ex.Keys.X)) {
       this.orderStop(true);
     }
   }

@@ -2,38 +2,11 @@ import * as ex from "excalibur";
 import { ColorizeGLSL } from "./materials";
 import { Config } from "./config";
 import { Map } from "./map";
-
-type ShipEvents = {
-  status: ShipStatusEvent;
-  selected: ShipSelectedEvent;
-}
-
-export class ShipStatusEvent extends ex.GameEvent<Ship> {
-  constructor(public target: Ship, public status: string) {
-    super();
-  }
-}
-
-export class ShipSelectedEvent extends ex.GameEvent<Ship> {
-  constructor(public target: Ship) {
-    super();
-  }
-}
-
-export class ShipStoppedEvent extends ex.GameEvent<Ship> {
-  constructor(public target: Ship) {
-    super();
-  }
-}
-
-export const ShipEvents = {
-  Status: 'status',
-  Selected: 'selected',
-  Stopped: 'stopped'
-} as const;
+import { PausableMotionSystem } from "./PausableMotionSystem";
+import * as gev from "./gameevents";
 
 export class Ship extends ex.Actor {
-  public events = new ex.EventEmitter<ex.ActorEvents & ShipEvents>();
+  public events = new ex.EventEmitter<ex.ActorEvents & gev.MyActorEvents & gev.ShipEvents>();
 
   map: Map;
   image: ex.ImageSource;
@@ -43,6 +16,8 @@ export class Ship extends ex.Actor {
   cargo: number = 0;
 
   tileQR: [number|null, number|null] = [null, null];
+
+  private motionSystem!: PausableMotionSystem;
 
   constructor(name: string, image: ex.ImageSource, color: ex.Color, map: Map) {
     super({
@@ -58,6 +33,8 @@ export class Ship extends ex.Actor {
   }
 
   override onInitialize(engine: ex.Engine) {
+    this.motionSystem = engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
+
     this.graphics.add(this.image.toSprite({destSize: {
       width: this.width,
       height: this.height,
@@ -73,15 +50,28 @@ export class Ship extends ex.Actor {
     this.on('pointerdown', evt => {
       evt.cancel();
       console.log(`You clicked the ship ${this.name} @${evt.worldPos.toString()}`);
-      this.events.emit(ShipEvents.Selected, new ShipSelectedEvent(this));
+      this.graphics.material!.color = ex.Color.Yellow;
+      this.events.emit(gev.MyActorEvents.Selected, new gev.ActorSelectedEvent(this));
     });
   }
 
+  public deselect() {
+    this.graphics.material!.color = this.color;
+  }
+
   public onPreUpdate(engine: ex.Engine, delta: number) {
+    if (this.motionSystem.paused) {
+      return;
+    }
+
     this._spaceDrag();
   }
 
   public update(engine: ex.Engine, delta: number) {
+    if (this.motionSystem.paused) {
+      return;
+    }
+
     super.update(engine, delta);
 
     if (!this.oldPos.equals(this.pos)) {
@@ -98,6 +88,10 @@ export class Ship extends ex.Actor {
   }
 
   public onPostUpdate(engine: ex.Engine, delta: number) {
+    if (this.motionSystem.paused) {
+      return;
+    }
+
     this._clamp();
     this._wrap(engine);
   }
@@ -105,7 +99,7 @@ export class Ship extends ex.Actor {
   public orderMoveTo(pos: ex.Vector) {
     this.autopilotEnabled = true;
     this.targetPos = pos.clone();
-    this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, `move to <${pos.x.toFixed(0)},${pos.y.toFixed(0)}>`));
+    this.events.emit(gev.ShipEvents.Status, new gev.ShipStatusEvent(this, `move to <${pos.x.toFixed(0)},${pos.y.toFixed(0)}>`));
   }
 
   private _autoPilot() {
@@ -242,7 +236,7 @@ export class Ship extends ex.Actor {
 
     this.targetPos.setTo(0, 0);
     this.autopilotEnabled = false;
-    this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, manual ? 'stopped (manual)' : 'stopped (autopilot)'));
-    this.events.emit(ShipEvents.Stopped, new ShipStoppedEvent(this));
+    this.events.emit(gev.ShipEvents.Status, new gev.ShipStatusEvent(this, manual ? 'stopped (manual)' : 'stopped (autopilot)'));
+    this.events.emit(gev.ShipEvents.Stopped, new gev.ShipStoppedEvent(this));
   }
 }

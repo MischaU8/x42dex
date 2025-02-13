@@ -88,7 +88,7 @@ export class Map extends ex.Actor {
             padding: 2,
             quality: 2
         });
-        this.selectedHexagon.z = 5;
+        // this.selectedHexagon.z = 0;
         this.selectedHexagon.graphics.isVisible = false;
         this.addChild(this.selectedHexagon);
 

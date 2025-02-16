@@ -63,6 +63,10 @@ export class MyLevel extends ex.Scene {
             this.onSelectShip(evt.target as Ship);
         });
 
+        this.player.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
+            this.onTargetShip(evt.target as Ship);
+        });
+
         this.player.events.on(gev.ShipEvents.Status, (evt: gev.ShipStatusEvent) => {
             this.setStatusLabel(evt.status);
         });
@@ -140,6 +144,10 @@ export class MyLevel extends ex.Scene {
             ship.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
                 this.onSelectShip(evt.target as Ship);
             });
+
+            ship.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
+                this.onTargetShip(evt.target as Ship);
+            });
         }
     }
 
@@ -159,6 +167,10 @@ export class MyLevel extends ex.Scene {
             astroid.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
                 this.onSelectAstroid(evt.target as StaticSpaceObject);
             });
+
+            astroid.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
+                this.onTargetAstroid(evt.target as StaticSpaceObject);
+            });
         }
     }
 
@@ -177,6 +189,10 @@ export class MyLevel extends ex.Scene {
 
             station.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
                 this.onSelectStation(evt.target as StaticSpaceObject);
+            });
+
+            station.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
+                this.onTargetStation(evt.target as StaticSpaceObject);
             });
         }
     }
@@ -241,6 +257,21 @@ export class MyLevel extends ex.Scene {
             ship.select();
             this.actorDetails.setTarget(ship);
         }
+    }
+
+    private onTargetShip(ship: Ship) {
+        console.log('Targeted ship', ship.name);
+        this.player.orderFollow(ship);
+    }
+
+    private onTargetAstroid(astroid: StaticSpaceObject) {
+        console.log('Targeted astroid', astroid.name);
+        this.player.orderMoveTo(astroid);
+    }
+
+    private onTargetStation(station: StaticSpaceObject) {
+        console.log('Targeted station', station.name);
+        this.player.orderMoveTo(station);
     }
 
     private shipAutoMine(ship: Ship) {

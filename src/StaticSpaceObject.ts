@@ -35,8 +35,13 @@ export class StaticSpaceObject extends ex.Actor {
 
     this.on('pointerdown', evt => {
       evt.cancel();
-      console.log(`You clicked the object ${this.name} @${evt.worldPos.toString()}`);
-      this.events.emit(gev.MyActorEvents.Selected, new gev.ActorSelectedEvent(this));
+      if (evt instanceof ex.PointerEvent && evt.button === ex.PointerButton.Left) {
+        console.log(`You selected the object ${this.name} @${evt.worldPos.toString()}`);
+        this.events.emit(gev.MyActorEvents.Selected, new gev.ActorSelectedEvent(this));
+      } else if (evt instanceof ex.PointerEvent && evt.button === ex.PointerButton.Right) {
+        console.log(`You targeted the object ${this.name} @${evt.worldPos.toString()}`);
+        this.events.emit(gev.MyActorEvents.Targeted, new gev.ActorTargetedEvent(this));
+      }
     });
   }
 

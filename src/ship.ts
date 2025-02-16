@@ -5,6 +5,8 @@ import { Map } from "./map";
 import { PausableMotionSystem } from "./PausableMotionSystem";
 import * as gev from "./gameevents";
 
+export type ShipTarget = ex.Vector | ex.Actor;
+
 export class Ship extends ex.Actor {
   public events = new ex.EventEmitter<ex.ActorEvents & gev.MyActorEvents & gev.ShipEvents>();
 
@@ -12,7 +14,7 @@ export class Ship extends ex.Actor {
   image: ex.ImageSource;
 
   autopilotEnabled: boolean = false;
-  targetPos: ex.Vector = ex.vec(0, 0);
+  target: ShipTarget = ex.vec(0, 0);
   cargo: number = 0;
 
   tileQR: [number|null, number|null] = [null, null];
@@ -49,20 +51,45 @@ export class Ship extends ex.Actor {
 
     this.on('pointerdown', evt => {
       evt.cancel();
-      console.log(`You clicked the ship ${this.name} @${evt.worldPos.toString()}`);
-      this.events.emit(gev.MyActorEvents.Selected, new gev.ActorSelectedEvent(this));
+      if (evt instanceof ex.PointerEvent) {
+        if (evt.button === ex.PointerButton.Left) {
+          console.log(`You selected the ship ${this.name} @${evt.worldPos.toString()}`);
+          this.events.emit(gev.MyActorEvents.Selected, new gev.ActorSelectedEvent(this));
+        } else if (evt.button === ex.PointerButton.Right) {
+          console.log(`You targeted the ship ${this.name} @${evt.worldPos.toString()}`);
+          this.events.emit(gev.MyActorEvents.Targeted, new gev.ActorTargetedEvent(this));
+        }
+      }
     });
+  }
+
+  public getTargetPos(): ex.Vector {
+    if (this.target instanceof ex.Vector) {
+      return this.target;
+    } else {
+      return this.target.pos;
+    }
+  }
+
+  public getTargetDetails(): string {
+    if (this.target === ex.Vector.Zero) {
+      return '---';
+    } else if (this.target instanceof ex.Vector) {
+      return `[${this.target.x.toFixed(0)},${this.target.y.toFixed(0)}]`;
+    } else {
+      return `[${this.target.name}]`;
+    }
   }
 
   public getDetails() {
     return `[${this.name}]
-  hex ${this.tileQR[0]},${this.tileQR[1]}
-angle ${(this.rotation * 180 / Math.PI).toFixed(0).padStart(3, "0")}°
-  vel ${this.vel.magnitude.toFixed(0).padStart(3, "0")}m/s
-  acc ${this.acc.magnitude.toFixed(0).padStart(3, "0")}m/s²
-cargo ${this.cargo.toFixed(0).padStart(3, "0")}
- auto ${this.autopilotEnabled?'on':'off'}
- goto ${this.autopilotEnabled?`${this.targetPos.x.toFixed(0)},${this.targetPos.y.toFixed(0)}`:"---"}`;
+   hex ${this.tileQR[0]},${this.tileQR[1]}
+ angle ${(this.rotation * 180 / Math.PI).toFixed(0).padStart(3, "0")}°
+   vel ${this.vel.magnitude.toFixed(0).padStart(3, "0")}m/s
+   acc ${this.acc.magnitude.toFixed(0).padStart(3, "0")}m/s²
+ cargo ${this.cargo.toFixed(0).padStart(3, "0")}
+  auto ${this.autopilotEnabled?'on':'off'}
+target ${this.getTargetDetails()}`;
   }
 
   public select() {
@@ -110,15 +137,21 @@ cargo ${this.cargo.toFixed(0).padStart(3, "0")}
     this._wrap(engine);
   }
 
-  public orderMoveTo(pos: ex.Vector) {
+  public orderMoveTo(pos: ex.Vector | ex.Actor) {
     this.autopilotEnabled = true;
-    this.targetPos = pos.clone();
-    this.events.emit(gev.ShipEvents.Status, new gev.ShipStatusEvent(this, `move to <${pos.x.toFixed(0)},${pos.y.toFixed(0)}>`));
+    this.target = pos;
+    this.events.emit(gev.ShipEvents.Status, new gev.ShipStatusEvent(this, `move to ${this.getTargetDetails()}`));
+  }
+
+  public orderFollow(ship: Ship) {
+    this.autopilotEnabled = true;
+    this.target = ship;
+    this.events.emit(gev.ShipEvents.Status, new gev.ShipStatusEvent(this, `follow ${ship.name}`));
   }
 
   private _autoPilot() {
-    if (!this.targetPos.equals(ex.Vector.Zero)) {
-      const delta = this.targetPos.sub(this.pos);
+    if (!this.getTargetPos().equals(ex.Vector.Zero)) {
+      const delta = this.getTargetPos().sub(this.pos);
       const distanceToTarget = delta.magnitude;
       const currentSpeed = this.vel.magnitude;
 
@@ -127,7 +160,7 @@ cargo ${this.cargo.toFixed(0).padStart(3, "0")}
         Config.PlayerMinLeadTime;
 
       const leadPos = this.pos.add(this.vel.scale(leadTime));
-      const leadDelta = this.targetPos.sub(leadPos);
+      const leadDelta = this.getTargetPos().sub(leadPos);
 
       // Calculate desired angle change
       const targetAngle = leadDelta.angleBetween(this.rotation + Math.PI / 2, ex.RotationType.ShortestPath);
@@ -149,7 +182,7 @@ cargo ${this.cargo.toFixed(0).padStart(3, "0")}
 
       var maxVelocity = this.calcMaxVelocity(distanceToTarget, alignment);
 
-      if (distanceToTarget < Config.AutoPilotStoppingDistance) {
+      if (distanceToTarget < Config.AutoPilotStoppingDistance && !(this.target instanceof Ship)) {
         // console.log('stopping')
         this.orderStop();
       } else if (distanceToTarget < breakingDistance || currentSpeed > maxVelocity) {
@@ -248,7 +281,7 @@ cargo ${this.cargo.toFixed(0).padStart(3, "0")}
     this.acc.setTo(0, 0);
     this.angularVelocity = 0;
 
-    this.targetPos.setTo(0, 0);
+    this.target = ex.Vector.Zero;
     this.autopilotEnabled = false;
     this.events.emit(gev.ShipEvents.Status, new gev.ShipStatusEvent(this, manual ? 'stopped (manual)' : 'stopped (autopilot)'));
     this.events.emit(gev.ShipEvents.Stopped, new gev.ShipStoppedEvent(this));

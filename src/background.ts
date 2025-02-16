@@ -8,7 +8,7 @@ export class Background extends ex.Actor {
     oldCameraPos!: ex.Vector;
     oldCameraZoom!: number;
     oldCameraViewport!: ex.BoundingBox;
-    
+
     constructor(random: ex.Random, sprite: ex.Sprite, factor: number) {
         super({
             pos: ex.vec(0, 0),
@@ -28,7 +28,7 @@ export class Background extends ex.Actor {
         this.backgroundSprite.sourceView.y = this.randomOffset.y;
         this.backgroundSprite.sourceView.width = engine.screen.drawWidth;
         this.backgroundSprite.sourceView.height = engine.screen.drawHeight;
-        
+
         this.backgroundSprite.destSize.width = engine.screen.drawWidth;
         this.backgroundSprite.destSize.height = engine.screen.drawHeight;
 
@@ -37,6 +37,14 @@ export class Background extends ex.Actor {
         this.oldCameraPos = engine.currentScene.camera.pos;
         this.oldCameraZoom = engine.currentScene.camera.zoom;
         this.oldCameraViewport = engine.currentScene.camera.viewport;
+
+        engine.screen.events.on('resize', () => {
+            this.backgroundSprite.sourceView.width = engine.screen.drawWidth;
+            this.backgroundSprite.sourceView.height = engine.screen.drawHeight;
+
+            this.backgroundSprite.destSize.width = engine.screen.drawWidth;
+            this.backgroundSprite.destSize.height = engine.screen.drawHeight;
+        })
     }
 
     onPostUpdate(engine: ex.Engine, elapsedMs: number): void {

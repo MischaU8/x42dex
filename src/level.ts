@@ -2,7 +2,7 @@ import * as ex from "excalibur";
 
 import * as gev from "./gameevents";
 
-import { ActorDetailsLabel } from "./ActorDetailsLabel";
+import { ActorDetailsPanel } from "./ActorDetailsPanel";
 import { Background } from "./background";
 import { Config } from "./config";
 import { Map } from "./map";
@@ -33,7 +33,7 @@ export class MyLevel extends ex.Scene {
             color: ex.Color.White
         })
     });
-    actorDetails = new ActorDetailsLabel();
+    actorDetails = new ActorDetailsPanel();
 
     override onInitialize(engine: ex.Engine): void {
         // replace the default motion system with a pausable one
@@ -44,7 +44,7 @@ export class MyLevel extends ex.Scene {
 
         this.add(this.map);
         this.add(this.statusLabel);
-        this.actorDetails.pos.setTo(10, engine.screen.drawHeight-172);
+        // this.actorDetails.pos.setTo(10, engine.screen.drawHeight-172);
         this.add(this.actorDetails);
         this.spawnPlayer(engine);
         this.spawnStations();

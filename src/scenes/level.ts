@@ -2,15 +2,22 @@ import * as ex from "excalibur";
 
 import * as gev from "../gameevents";
 
+import { AstroidTypes, AstroidTypeKey } from "../data/astroids";
+import { MinableWares } from "../data/wares";
+import { Config } from "../config";
+import { Resources } from "../resources";
+
 import { ActorDetailsPanel } from "../hud/ActorDetailsPanel";
 import { Background } from "../actors/background";
-import { Config } from "../config";
+
 import { Map } from "../actors/map";
-import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 import { Player } from "../actors/player";
-import { Resources } from "../resources";
 import { Ship, ShipEvents, ShipStatusEvent } from "../actors/ship";
 import { StaticSpaceObject } from "../actors/StaticSpaceObject";
+
+import { PausableMotionSystem } from "../systems/PausableMotionSystem";
+import { MinableComponent } from "../components/minable";
+import { StationComponent } from "../components/station";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
@@ -153,14 +160,22 @@ export class MyLevel extends ex.Scene {
 
     private spawnAstroids() {
         for (let i = 0; i < Config.NumAstroids; i++) {
-            const astroidImage = this.random.pickOne([Resources.AstroidA, Resources.AstroidB, Resources.AstroidC, Resources.AstroidD, Resources.AstroidE, Resources.AstroidF, Resources.AstroidG, Resources.AstroidH]);
-            const astroidColor = this.random.pickOne([ex.Color.Brown, ex.Color.Gray]);
             const pos = this.getRandomPosWithMinDistance();
             if (pos.equals(ex.Vector.Zero)) {
-                console.log('Failed to get a valid position for astroid', i);
+                console.warn('Failed to get a valid position for astroid', i);
                 break;
             }
-            const astroid = new StaticSpaceObject(`Astroid ${i}`, astroidImage, astroidColor, pos);
+
+            // TODO weight the astroid type by frequency
+            const astroidTypeKey = this.random.pickOne(Object.keys(AstroidTypes));
+            const astroidType = AstroidTypes[astroidTypeKey as AstroidTypeKey];
+            const astroid = new StaticSpaceObject(`${astroidType.name} Astroid #${i}`, astroidType.image, astroidType.color, pos);
+            astroid.addComponent(new MinableComponent(
+                astroidTypeKey as MinableWares,
+                this.random.integer(astroidType.minAmount, astroidType.maxAmount),
+                astroidType.maxAmount,
+                this.random.floating(astroidType.minRespawnRate, astroidType.maxRespawnRate),
+            ));
             this.add(astroid);
             this.staticObjects.push(astroid);
 
@@ -176,14 +191,16 @@ export class MyLevel extends ex.Scene {
 
     private spawnStations() {
         for (let i = 0; i < Config.NumStations; i++) {
-            const stationImage = this.random.pickOne([Resources.StationA, Resources.StationB]);
-            const stationColor = this.random.pickOne([ex.Color.ExcaliburBlue, ex.Color.Vermilion]);
             const pos = this.getRandomPosWithMinDistance();
             if (pos.equals(ex.Vector.Zero)) {
                 console.log('Failed to get a valid position for station', i);
                 break;
             }
+
+            const stationImage = this.random.pickOne([Resources.StationA, Resources.StationB]);
+            const stationColor = this.random.pickOne([ex.Color.ExcaliburBlue, ex.Color.Vermilion]);
             const station = new StaticSpaceObject(`Station ${i}`, stationImage, stationColor, pos);
+            station.addComponent(new StationComponent());
             this.add(station);
             this.staticObjects.push(station);
 
@@ -275,17 +292,17 @@ export class MyLevel extends ex.Scene {
     }
 
     private shipAutoMine(ship: Ship) {
-        let targetName = ''
+        let target: StaticSpaceObject;
         if (ship.cargo > 0) {
             // console.log('Ship', ship.name, 'stopped at station');
             ship.cargo = 0;
-            targetName = 'Astroid';
+            target = this.getRandomStaticObjectWithComponent(MinableComponent);
         } else {
             // console.log('Ship', ship.name, 'stopped at astroid');
             ship.cargo = Config.MaxCargo;
-            targetName = 'Station';
+            target = this.getRandomStaticObjectWithComponent(StationComponent);
         }
-        ship.orderMoveTo(this.getRandomStaticObjectWithPrefix(targetName).pos);
+        ship.orderMoveTo(target);
     }
 
     private setStatusLabel(status: string, duration: number = 1000) {
@@ -299,8 +316,8 @@ export class MyLevel extends ex.Scene {
         }
     }
 
-    private getRandomStaticObjectWithPrefix(prefix: string): StaticSpaceObject {
-        const objects = this.staticObjects.filter(obj => obj.name.startsWith(prefix));
+    private getRandomStaticObjectWithComponent(component: ex.ComponentCtor<ex.Component>): StaticSpaceObject {
+        const objects = this.staticObjects.filter(obj => obj.has(component));
         return this.random.pickOne(objects);
     }
 

@@ -40,7 +40,7 @@ export class Ship extends ex.Actor {
 
   tileQR: [number|null, number|null] = [null, null];
 
-  private motionSystem!: PausableMotionSystem;
+  motionSystem!: PausableMotionSystem;
 
   constructor(name: string, image: ex.ImageSource, color: ex.Color, map: Map) {
     super({

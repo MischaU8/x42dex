@@ -1,16 +1,16 @@
 import * as ex from "excalibur";
 
-import * as gev from "./gameevents";
+import * as gev from "../gameevents";
 
-import { ActorDetailsPanel } from "./ActorDetailsPanel";
-import { Background } from "./background";
-import { Config } from "./config";
-import { Map } from "./map";
-import { PausableMotionSystem } from "./PausableMotionSystem";
-import { Player } from "./player";
-import { Resources } from "./resources";
-import { Ship } from "./ship";
-import { StaticSpaceObject } from "./StaticSpaceObject";
+import { ActorDetailsPanel } from "../hud/ActorDetailsPanel";
+import { Background } from "../actors/background";
+import { Config } from "../config";
+import { Map } from "../actors/map";
+import { PausableMotionSystem } from "../systems/PausableMotionSystem";
+import { Player } from "../actors/player";
+import { Resources } from "../resources";
+import { Ship, ShipEvents, ShipStatusEvent } from "../actors/ship";
+import { StaticSpaceObject } from "../actors/StaticSpaceObject";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
@@ -67,7 +67,7 @@ export class MyLevel extends ex.Scene {
             this.onTargetShip(evt.target as Ship);
         });
 
-        this.player.events.on(gev.ShipEvents.Status, (evt: gev.ShipStatusEvent) => {
+        this.player.events.on(ShipEvents.Status, (evt: ShipStatusEvent) => {
             this.setStatusLabel(evt.status);
         });
     }
@@ -137,7 +137,7 @@ export class MyLevel extends ex.Scene {
 
             this.shipAutoMine(ship);
 
-            ship.events.on(gev.ShipEvents.Stopped, () => {
+            ship.events.on(ShipEvents.Stopped, () => {
                 this.shipAutoMine(ship);
             });
 

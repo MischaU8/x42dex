@@ -1,6 +1,6 @@
 import * as ex from "excalibur";
-import { Config } from "./config";
-import { Ship } from "./ship";
+import { Config } from "../config";
+import { Ship } from "../actors/ship";
 export class ActorDetailsLabel extends ex.Label {
 
     target?: ex.Actor;

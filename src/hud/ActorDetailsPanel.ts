@@ -1,5 +1,5 @@
 import * as ex from "excalibur";
-import { Ship } from "./ship";
+import { Ship } from "../actors/ship";
 
 const ui = document.getElementById('ui')
 

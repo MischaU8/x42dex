@@ -1,7 +1,7 @@
 import * as ex from "excalibur";
-import { ColorizeGLSL } from "./materials";
-import { Config } from "./config";
-import * as gev from "./gameevents";
+import { ColorizeGLSL } from "../materials";
+import { Config } from "../config";
+import * as gev from "../gameevents";
 
 
 export class StaticSpaceObject extends ex.Actor {

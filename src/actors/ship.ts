@@ -1,14 +1,35 @@
 import * as ex from "excalibur";
-import { ColorizeGLSL } from "./materials";
-import { Config } from "./config";
+import { ColorizeGLSL } from "../materials";
+import { Config } from "../config";
 import { Map } from "./map";
-import { PausableMotionSystem } from "./PausableMotionSystem";
-import * as gev from "./gameevents";
+import { PausableMotionSystem } from "../systems/PausableMotionSystem";
+import * as gev from "../gameevents";
+
+export type ShipEvents = {
+  status: ShipStatusEvent;
+  stopped: ShipStoppedEvent;
+}
+
+export class ShipStatusEvent extends ex.GameEvent<Ship> {
+  constructor(public target: Ship, public status: string) {
+    super();
+  }
+}
+export class ShipStoppedEvent extends ex.GameEvent<Ship> {
+  constructor(public target: Ship) {
+    super();
+  }
+}
+
+export const ShipEvents = {
+  Status: 'status',
+  Stopped: 'stopped'
+} as const;
 
 export type ShipTarget = ex.Vector | ex.Actor;
 
 export class Ship extends ex.Actor {
-  public events = new ex.EventEmitter<ex.ActorEvents & gev.MyActorEvents & gev.ShipEvents>();
+  public events = new ex.EventEmitter<ex.ActorEvents & gev.MyActorEvents & ShipEvents>();
 
   map: Map;
   image: ex.ImageSource;
@@ -140,13 +161,13 @@ target ${this.getTargetDetails()}`;
   public orderMoveTo(pos: ex.Vector | ex.Actor) {
     this.autopilotEnabled = true;
     this.target = pos;
-    this.events.emit(gev.ShipEvents.Status, new gev.ShipStatusEvent(this, `move to ${this.getTargetDetails()}`));
+    this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, `move to ${this.getTargetDetails()}`));
   }
 
   public orderFollow(ship: Ship) {
     this.autopilotEnabled = true;
     this.target = ship;
-    this.events.emit(gev.ShipEvents.Status, new gev.ShipStatusEvent(this, `follow ${ship.name}`));
+    this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, `follow ${ship.name}`));
   }
 
   private _autoPilot() {
@@ -283,7 +304,7 @@ target ${this.getTargetDetails()}`;
 
     this.target = ex.Vector.Zero;
     this.autopilotEnabled = false;
-    this.events.emit(gev.ShipEvents.Status, new gev.ShipStatusEvent(this, manual ? 'stopped (manual)' : 'stopped (autopilot)'));
-    this.events.emit(gev.ShipEvents.Stopped, new gev.ShipStoppedEvent(this));
+    this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, manual ? 'stopped (manual)' : 'stopped (autopilot)'));
+    this.events.emit(ShipEvents.Stopped, new ShipStoppedEvent(this));
   }
 }

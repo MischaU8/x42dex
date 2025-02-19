@@ -1,7 +1,7 @@
 import * as ex from "excalibur";
 import { Hexagon } from "./hexagon";
 
-import { hex_to_pixel, pixel_to_flat_hex } from "./hex_tools";
+import { hex_to_pixel, pixel_to_flat_hex } from "../hex_tools";
 
 const MAP_FOG_COLORS = [
     ex.Color.fromHex('#112233'),

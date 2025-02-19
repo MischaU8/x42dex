@@ -1,6 +1,6 @@
 import * as ex from "excalibur";
 import { loader } from "./resources";
-import { MyLevel } from "./level";
+import { MyLevel } from "./scenes/level";
 import { Config } from "./config";
 
 // Goal is to keep main.ts small and just enough to configure the engine

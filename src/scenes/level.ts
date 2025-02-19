@@ -18,6 +18,7 @@ import { StaticSpaceObject } from "../actors/StaticSpaceObject";
 import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 import { MinableComponent } from "../components/minable";
 import { StationComponent } from "../components/station";
+import { AutopilotComponent } from "../components/autopilot";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
@@ -64,6 +65,7 @@ export class MyLevel extends ex.Scene {
     private spawnPlayer(engine: ex.Engine<any>) {
         this.player.pos = ex.vec(this.map.gridWidth / 2, this.map.gridHeight / 2 - this.map.hexHeight / 2);
         engine.currentScene.camera.pos = this.player.pos;
+        this.player.addComponent(new AutopilotComponent(this.player));
         this.add(this.player);
 
         this.player.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
@@ -140,6 +142,7 @@ export class MyLevel extends ex.Scene {
             // ship.graphics.isVisible = false;
             ship.pos = pos;
             ship.cargo = 1; // cheat so we start mining
+            ship.addComponent(new AutopilotComponent(ship));
             this.add(ship);
 
             this.shipAutoMine(ship);

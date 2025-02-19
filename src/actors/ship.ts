@@ -4,6 +4,7 @@ import { Config } from "../config";
 import { Map } from "./map";
 import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 import * as gev from "../gameevents";
+import { AutopilotComponent } from "../components/autopilot";
 
 export type ShipEvents = {
   status: ShipStatusEvent;
@@ -26,19 +27,14 @@ export const ShipEvents = {
   Stopped: 'stopped'
 } as const;
 
-export type ShipTarget = ex.Vector | ex.Actor;
 
 export class Ship extends ex.Actor {
   public events = new ex.EventEmitter<ex.ActorEvents & gev.MyActorEvents & ShipEvents>();
 
   map: Map;
   image: ex.ImageSource;
-
-  autopilotEnabled: boolean = false;
-  target: ShipTarget = ex.vec(0, 0);
   cargo: number = 0;
-
-  tileQR: [number|null, number|null] = [null, null];
+  tileQR: [number | null, number | null] = [null, null];
 
   motionSystem!: PausableMotionSystem;
 
@@ -58,10 +54,12 @@ export class Ship extends ex.Actor {
   override onInitialize(engine: ex.Engine) {
     this.motionSystem = engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
 
-    this.graphics.add(this.image.toSprite({destSize: {
-      width: this.width,
-      height: this.height,
-    },}));
+    this.graphics.add(this.image.toSprite({
+      destSize: {
+        width: this.width,
+        height: this.height,
+      },
+    }));
 
     const material = engine.graphicsContext.createMaterial({
       name: 'colorize',
@@ -84,23 +82,7 @@ export class Ship extends ex.Actor {
     });
   }
 
-  public getTargetPos(): ex.Vector {
-    if (this.target instanceof ex.Vector) {
-      return this.target;
-    } else {
-      return this.target.pos;
-    }
-  }
 
-  public getTargetDetails(): string {
-    if (this.target === ex.Vector.Zero) {
-      return '---';
-    } else if (this.target instanceof ex.Vector) {
-      return `[${this.target.x.toFixed(0)},${this.target.y.toFixed(0)}]`;
-    } else {
-      return `[${this.target.name}]`;
-    }
-  }
 
   public getDetails() {
     return `[${this.name}]
@@ -109,8 +91,8 @@ export class Ship extends ex.Actor {
    vel ${this.vel.magnitude.toFixed(0).padStart(3, "0")}m/s
    acc ${this.acc.magnitude.toFixed(0).padStart(3, "0")}m/s²
  cargo ${this.cargo.toFixed(0).padStart(3, "0")}
-  auto ${this.autopilotEnabled?'on':'off'}
-target ${this.getTargetDetails()}`;
+  auto ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
+target ${this.get(AutopilotComponent)?.getTargetDetails()}`;
   }
 
   public select() {
@@ -143,10 +125,6 @@ target ${this.getTargetDetails()}`;
         this.map.visitTile(this, qr);
       }
     }
-
-    if (this.autopilotEnabled) {
-      this._autoPilot();
-    }
   }
 
   public onPostUpdate(engine: ex.Engine, delta: number) {
@@ -159,77 +137,13 @@ target ${this.getTargetDetails()}`;
   }
 
   public orderMoveTo(pos: ex.Vector | ex.Actor) {
-    this.autopilotEnabled = true;
-    this.target = pos;
-    this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, `move to ${this.getTargetDetails()}`));
+    this.get(AutopilotComponent)?.setTarget(pos);
+    this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, `move to ${this.get(AutopilotComponent)?.getTargetDetails()}`));
   }
 
   public orderFollow(ship: Ship) {
-    this.autopilotEnabled = true;
-    this.target = ship;
+    this.get(AutopilotComponent)?.setTarget(ship);
     this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, `follow ${ship.name}`));
-  }
-
-  private _autoPilot() {
-    if (!this.getTargetPos().equals(ex.Vector.Zero)) {
-      const delta = this.getTargetPos().sub(this.pos);
-      const distanceToTarget = delta.magnitude;
-      const currentSpeed = this.vel.magnitude;
-
-      const leadTime = currentSpeed > 0 ?
-        (distanceToTarget / currentSpeed) * Config.PlayerLeadTime :
-        Config.PlayerMinLeadTime;
-
-      const leadPos = this.pos.add(this.vel.scale(leadTime));
-      const leadDelta = this.getTargetPos().sub(leadPos);
-
-      // Calculate desired angle change
-      const targetAngle = leadDelta.angleBetween(this.rotation + Math.PI / 2, ex.RotationType.ShortestPath);
-      // Gradually adjust angular velocity towards target
-      if (Math.abs(targetAngle) > 0.001) {
-        const direction = Math.sign(targetAngle);
-        if (direction > 0) {
-          this.rotateRight();
-        } else {
-          this.rotateLeft();
-        }
-      }
-
-      // Calculate how aligned we are with the target (-1 to 1, where 1 is perfectly aligned)
-      const alignment = Math.cos(leadDelta.angleBetween(this.rotation - Math.PI / 2, ex.RotationType.ShortestPath));
-
-      const breakingDistance = this.calcBreakingDistance(currentSpeed, Config.PlayerMaxDeceleration);
-      const coastingDistance = this.calcBreakingDistance(currentSpeed, Config.PlayerMaxAcceleration);
-
-      var maxVelocity = this.calcMaxVelocity(distanceToTarget, alignment);
-
-      if (distanceToTarget < Config.AutoPilotStoppingDistance && !(this.target instanceof Ship)) {
-        // console.log('stopping')
-        this.orderStop();
-      } else if (distanceToTarget < breakingDistance || currentSpeed > maxVelocity) {
-        // console.log('breaking')
-        this.moveBackward()
-      } else if (distanceToTarget > coastingDistance && currentSpeed < maxVelocity) {
-        // console.log('accelerating')
-        this.moveForward();
-      } else {
-        // console.log('coasting')
-      }
-    }
-  }
-
-  private calcBreakingDistance(vel: number, acc: number) {
-    return (vel * vel) / (2 * acc);
-  }
-
-  private calcMaxVelocity(distanceToTarget: number, alignment: number) {
-    if (distanceToTarget < Config.AutoPilotStoppingDistance) {
-      return 0;
-    } else if (alignment < 0) {
-      return Config.PlayerMaxVelocity * Config.AutoPilotAlignmentVelocityFactor;
-    } else {
-      return Config.PlayerMaxVelocity * alignment;
-    }
   }
 
   private _clamp() {
@@ -239,16 +153,16 @@ target ${this.getTargetDetails()}`;
   }
 
   private _wrap(engine: ex.Engine) {
-    if (this.pos.x < -this.map.hexWidth/2) {
+    if (this.pos.x < -this.map.hexWidth / 2) {
       this.pos.x += this.map.gridWidth;
     }
-    if (this.pos.x > this.map.gridWidth - this.map.hexWidth/2) {
+    if (this.pos.x > this.map.gridWidth - this.map.hexWidth / 2) {
       this.pos.x -= this.map.gridWidth;
     }
-    if (this.pos.y < -this.map.hexHeight*0.75) {
+    if (this.pos.y < -this.map.hexHeight * 0.75) {
       this.pos.y += this.map.gridHeight;
     }
-    if (this.pos.y > this.map.gridHeight - this.map.hexHeight*0.75) {
+    if (this.pos.y > this.map.gridHeight - this.map.hexHeight * 0.75) {
       this.pos.y -= this.map.gridHeight;
     }
   }
@@ -302,8 +216,7 @@ target ${this.getTargetDetails()}`;
     this.acc.setTo(0, 0);
     this.angularVelocity = 0;
 
-    this.target = ex.Vector.Zero;
-    this.autopilotEnabled = false;
+    this.get(AutopilotComponent)?.disable();
     this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, manual ? 'stopped (manual)' : 'stopped (autopilot)'));
     this.events.emit(ShipEvents.Stopped, new ShipStoppedEvent(this));
   }

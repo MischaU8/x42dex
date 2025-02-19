@@ -13,11 +13,6 @@ export class AutopilotComponent extends ex.Component {
     target: ex.Vector | ex.Actor = ex.Vector.Zero;
     motionSystem!: PausableMotionSystem;
 
-    constructor(owner: Ship) {
-        super();
-        this.owner = owner;
-    }
-
     onAdd(owner: ex.Actor): void {
         owner.on('initialize', (evt: ex.InitializeEvent) => {
             this.motionSystem = evt.engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;

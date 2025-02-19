@@ -5,6 +5,7 @@ import { Map } from "./map";
 import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 import * as gev from "../gameevents";
 import { AutopilotComponent } from "../components/autopilot";
+import { CargoComponent } from "../components/cargo";
 
 export type ShipEvents = {
   status: ShipStatusEvent;
@@ -90,7 +91,7 @@ export class Ship extends ex.Actor {
  angle ${(this.rotation * 180 / Math.PI).toFixed(0).padStart(3, "0")}°
    vel ${this.vel.magnitude.toFixed(0).padStart(3, "0")}m/s
    acc ${this.acc.magnitude.toFixed(0).padStart(3, "0")}m/s²
- cargo ${this.cargo.toFixed(0).padStart(3, "0")}
+ cargo ${this.get(CargoComponent)?.getDetails()}
   auto ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
 target ${this.get(AutopilotComponent)?.getTargetDetails()}`;
   }

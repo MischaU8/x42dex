@@ -20,6 +20,7 @@ import { MinableComponent } from "../components/minable";
 import { StationComponent } from "../components/station";
 import { AutopilotComponent } from "../components/autopilot";
 import { CargoComponent } from "../components/cargo";
+import { AutominerComponent } from "../components/autominer";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
@@ -143,15 +144,10 @@ export class MyLevel extends ex.Scene {
             const ship = new Ship(`Ship ${i}`, shipImage, shipColor, this.map);
             // ship.graphics.isVisible = false;
             ship.pos = pos;
-            ship.addComponent(new AutopilotComponent());
             ship.addComponent(new CargoComponent());
+            ship.addComponent(new AutopilotComponent());
+            ship.addComponent(new AutominerComponent(this));
             this.add(ship);
-
-            this.shipAutoMine(ship);
-
-            ship.events.on(ShipEvents.Stopped, () => {
-                this.shipAutoMine(ship);
-            });
 
             ship.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
                 this.onSelectShip(evt.target as Ship);
@@ -296,21 +292,6 @@ export class MyLevel extends ex.Scene {
         this.player.orderMoveTo(station);
     }
 
-    private shipAutoMine(ship: Ship) {
-        const cargo = ship.get(CargoComponent);
-        let target: StaticSpaceObject;
-        if (cargo.volume > 0) {
-            // console.log('Ship', ship.name, 'stopped at station');
-            cargo.volume = 0;
-            target = this.getRandomStaticObjectWithComponent(MinableComponent);
-        } else {
-            // console.log('Ship', ship.name, 'stopped at astroid');
-            cargo.volume = Config.MaxCargo;
-            target = this.getRandomStaticObjectWithComponent(StationComponent);
-        }
-        ship.orderMoveTo(target);
-    }
-
     private setStatusLabel(status: string, duration: number = 1000) {
         this.statusLabel.text = status;
         if (duration > 0) {
@@ -322,7 +303,7 @@ export class MyLevel extends ex.Scene {
         }
     }
 
-    private getRandomStaticObjectWithComponent(component: ex.ComponentCtor<ex.Component>): StaticSpaceObject {
+    public getRandomStaticObjectWithComponent(component: ex.ComponentCtor<ex.Component>): StaticSpaceObject {
         const objects = this.staticObjects.filter(obj => obj.has(component));
         return this.random.pickOne(objects);
     }

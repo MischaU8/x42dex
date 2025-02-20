@@ -143,7 +143,6 @@ export class MyLevel extends ex.Scene {
             const ship = new Ship(`Ship ${i}`, shipImage, shipColor, this.map);
             // ship.graphics.isVisible = false;
             ship.pos = pos;
-            ship.cargo = 1; // cheat so we start mining
             ship.addComponent(new AutopilotComponent());
             ship.addComponent(new CargoComponent());
             this.add(ship);
@@ -298,14 +297,15 @@ export class MyLevel extends ex.Scene {
     }
 
     private shipAutoMine(ship: Ship) {
+        const cargo = ship.get(CargoComponent);
         let target: StaticSpaceObject;
-        if (ship.cargo > 0) {
+        if (cargo.volume > 0) {
             // console.log('Ship', ship.name, 'stopped at station');
-            ship.cargo = 0;
+            cargo.volume = 0;
             target = this.getRandomStaticObjectWithComponent(MinableComponent);
         } else {
             // console.log('Ship', ship.name, 'stopped at astroid');
-            ship.cargo = Config.MaxCargo;
+            cargo.volume = Config.MaxCargo;
             target = this.getRandomStaticObjectWithComponent(StationComponent);
         }
         ship.orderMoveTo(target);

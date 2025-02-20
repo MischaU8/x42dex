@@ -34,7 +34,6 @@ export class Ship extends ex.Actor {
 
   map: Map;
   image: ex.ImageSource;
-  cargo: number = 0;
   tileQR: [number | null, number | null] = [null, null];
 
   motionSystem!: PausableMotionSystem;

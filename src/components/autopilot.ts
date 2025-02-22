@@ -94,7 +94,7 @@ export class AutopilotComponent extends ex.Component {
         } else if (this.target instanceof ex.Vector) {
             return `[${this.target.x.toFixed(0)},${this.target.y.toFixed(0)}]`;
         } else {
-            return `[${this.target.name}]`;
+            return `[${this.target.name}] ${this.target.pos.distance(this.owner.pos).toFixed(0)}m`;
         }
     }
 

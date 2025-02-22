@@ -27,7 +27,15 @@ export const Config = {
     PlayerMaxDeceleration: 169,
     PlayerMaxAngularVelocity: 1.17, // 67 degrees per second
 
-    MaxCargo: 100,
+    // autominer
+    AutoMinerMinMineAmount: 10,
+    AutoMinerMaxMineAmount: 50,
+    AutoMinerMinUnloadThreshold: 0.5,
+    AutoMinerMaxUnloadThreshold: 0.9,
+    AutoMinerMinTopNAstroids: 3,
+    AutoMinerMaxTopNAstroids: 5,
+    AutoMinerMinTopNStations: 1,
+    AutoMinerMaxTopNStations: 3,
 
     // autopilot
     PlayerLeadTime: 0.5,

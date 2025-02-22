@@ -58,7 +58,7 @@ export class AutopilotComponent extends ex.Component {
 
         if (distanceToTarget < Config.AutoPilotStoppingDistance && !(this.target instanceof Ship)) {
             // console.log('stopping')
-            this.owner.orderStop();
+            this.owner.orderStop(false, this.target);
         } else if (distanceToTarget < breakingDistance || currentSpeed > maxVelocity) {
             // console.log('breaking')
             this.owner.moveBackward()

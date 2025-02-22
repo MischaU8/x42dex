@@ -8,8 +8,8 @@ export const AstroidTypes = {
         name: 'Ore',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
-        minAmount: 10,
-        maxAmount: 100,
+        minAmount: 100,
+        maxAmount: 1000,
         image: Resources.AstroidA,
         color: ex.Color.Brown,
     },
@@ -17,8 +17,8 @@ export const AstroidTypes = {
         name: 'Silicon',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
-        minAmount: 10,
-        maxAmount: 100,
+        minAmount: 100,
+        maxAmount: 1000,
         image: Resources.AstroidB,
         color: ex.Color.Gray
     },
@@ -27,7 +27,7 @@ export const AstroidTypes = {
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
         minAmount: 100,
-        maxAmount: 100,
+        maxAmount: 1000,
         image: Resources.AstroidC,
         color: ex.Color.White
     },
@@ -35,8 +35,8 @@ export const AstroidTypes = {
         name: 'Helium',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
-        minAmount: 10,
-        maxAmount: 100,
+        minAmount: 100,
+        maxAmount: 1000,
         image: Resources.AstroidD,
         color: ex.Color.Blue
     },
@@ -44,8 +44,8 @@ export const AstroidTypes = {
         name: 'Hydrogen',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
-        minAmount: 10,
-        maxAmount: 100,
+        minAmount: 100,
+        maxAmount: 1000,
         image: Resources.AstroidD,
         color: ex.Color.Purple
     },
@@ -53,8 +53,8 @@ export const AstroidTypes = {
         name: 'Methane',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
-        minAmount: 10,
-        maxAmount: 100,
+        minAmount: 100,
+        maxAmount: 1000,
         image: Resources.AstroidD,
         color: ex.Color.Green
     }

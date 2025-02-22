@@ -4,9 +4,9 @@ import { Config } from "../config";
 import { Map } from "./map";
 import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 import * as gev from "../gameevents";
-import { AutopilotComponent } from "../components/autopilot";
+import { AutopilotComponent, ShipTarget } from "../components/autopilot";
 import { CargoComponent } from "../components/cargo";
-
+import { AutominerComponent } from "../components/autominer";
 export type ShipEvents = {
   status: ShipStatusEvent;
   stopped: ShipStoppedEvent;
@@ -18,7 +18,7 @@ export class ShipStatusEvent extends ex.GameEvent<Ship> {
   }
 }
 export class ShipStoppedEvent extends ex.GameEvent<Ship> {
-  constructor(public target: Ship) {
+  constructor(public target: Ship, public where: ShipTarget) {
     super();
   }
 }
@@ -85,14 +85,17 @@ export class Ship extends ex.Actor {
 
 
   public getDetails() {
-    return `[${this.name}]
+    return `--[${this.name}]--
    hex ${this.tileQR[0]},${this.tileQR[1]}
  angle ${(this.rotation * 180 / Math.PI).toFixed(0).padStart(3, "0")}°
    vel ${this.vel.magnitude.toFixed(0).padStart(3, "0")}m/s
    acc ${this.acc.magnitude.toFixed(0).padStart(3, "0")}m/s²
+
  cargo ${this.get(CargoComponent)?.getDetails()}
-  auto ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
-target ${this.get(AutopilotComponent)?.getTargetDetails()}`;
+
+autominer ${this.get(AutominerComponent)?.getDetails() || 'off'}
+autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
+   target ${this.get(AutopilotComponent)?.getTargetDetails()}`;
   }
 
   public select() {
@@ -211,13 +214,13 @@ target ${this.get(AutopilotComponent)?.getTargetDetails()}`;
     }
   }
 
-  public orderStop(manual: boolean = false) {
+  public orderStop(manual: boolean = false, target: ShipTarget = ex.Vector.Zero) {
     this.vel.setTo(0, 0);
     this.acc.setTo(0, 0);
     this.angularVelocity = 0;
 
     this.get(AutopilotComponent)?.disable();
     this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, manual ? 'stopped (manual)' : 'stopped (autopilot)'));
-    this.events.emit(ShipEvents.Stopped, new ShipStoppedEvent(this));
+    this.events.emit(ShipEvents.Stopped, new ShipStoppedEvent(this, target));
   }
 }

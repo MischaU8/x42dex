@@ -1,6 +1,7 @@
 import * as ex from "excalibur";
 import { Ship } from "../actors/ship";
 import { MinableComponent } from "../components/minable";
+import { StationComponent } from "../components/station";
 const ui = document.getElementById('ui')
 
 export class ActorDetailsPanel extends ex.Label {
@@ -51,13 +52,12 @@ export class ActorDetailsPanel extends ex.Label {
         if (this.target) {
             if (this.target instanceof Ship) {
                 text = this.target.getDetails();
+            } else if (this.target.has(MinableComponent)) {
+                text = this.target.get(MinableComponent).getDetails();
+            } else if (this.target.has(StationComponent)) {
+                text = this.target.get(StationComponent).getDetails();
             } else {
-                const maybeMinable = this.target.get(MinableComponent);
-                if (maybeMinable) {
-                    text = maybeMinable.getDetails();
-                } else {
-                    text = `[${this.target.name}]`;
-                }
+                text = `[${this.target.name}]`;
             }
         } else {
             text = ''

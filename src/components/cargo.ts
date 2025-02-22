@@ -24,6 +24,9 @@ export class CargoComponent extends ex.Component {
         this.volume -= Wares[item as WaresKey].volume * amount;
         ex.assert(`Cargo item amount exceeded min amount: ${this.items[item]} < 0`, () => this.items[item] >= 0);
         ex.assert(`Cargo volume exceeded min volume: ${this.volume} < 0`, () => this.volume >= 0);
+        if (this.items[item] === 0) {
+            delete this.items[item];
+        }
     }
 
     getAvailableSpace(): number {
@@ -35,6 +38,11 @@ export class CargoComponent extends ex.Component {
     }
 
     getDetails(): string {
-        return `volume: ${this.volume}/${this.maxVolume}\n${Object.entries(this.items).map(([item, amount]) => `${item}: ${amount}`).join('\n')}`;
+        let details = `${this.volume.toFixed(0)}/${this.maxVolume.toFixed(0)}m³`;
+        if (this.volume > 0) {
+            const items = Object.entries(this.items).map(([item, amount]) => `${item.padStart(8, " ")} ${amount.toFixed(0)}x`);
+            details += `\n${items.join('\n')}`;
+        }
+        return details;
     }
 }

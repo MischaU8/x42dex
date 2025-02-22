@@ -146,7 +146,11 @@ export class MyLevel extends ex.Scene {
             ship.pos = pos;
             ship.addComponent(new CargoComponent());
             ship.addComponent(new AutopilotComponent());
-            ship.addComponent(new AutominerComponent(this));
+            ship.addComponent(new AutominerComponent(this,
+                this.random.integer(Config.AutoMinerMinMineAmount, Config.AutoMinerMaxMineAmount),
+                this.random.floating(Config.AutoMinerMinUnloadThreshold, Config.AutoMinerMaxUnloadThreshold),
+                this.random.integer(Config.AutoMinerMinTopNAstroids, Config.AutoMinerMaxTopNAstroids),
+                this.random.integer(Config.AutoMinerMinTopNStations, Config.AutoMinerMaxTopNStations)));
             this.add(ship);
 
             ship.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
@@ -202,6 +206,7 @@ export class MyLevel extends ex.Scene {
             const stationColor = this.random.pickOne([ex.Color.ExcaliburBlue, ex.Color.Vermilion]);
             const station = new StaticSpaceObject(`Station ${i}`, stationImage, stationColor, pos);
             station.addComponent(new StationComponent());
+            station.addComponent(new CargoComponent(100_000));
             this.add(station);
             this.staticObjects.push(station);
 
@@ -301,6 +306,12 @@ export class MyLevel extends ex.Scene {
                 }
             }, duration);
         }
+    }
+
+    public getNearbyStaticObjectWithComponent(source: ex.Actor, component: ex.ComponentCtor<ex.Component>, topN: number = 1, exclude: ex.Actor | null = null): StaticSpaceObject {
+        const objects = this.staticObjects.filter(obj => obj.has(component) && obj !== exclude);
+        const sortedObjects = objects.sort((a, b) => source.pos.distance(a.pos) - source.pos.distance(b.pos));
+        return this.random.pickOne(sortedObjects.slice(0, topN));
     }
 
     public getRandomStaticObjectWithComponent(component: ex.ComponentCtor<ex.Component>): StaticSpaceObject {

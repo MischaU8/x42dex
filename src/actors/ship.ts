@@ -136,7 +136,8 @@ autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
     }
 
     this._clamp();
-    this._wrap(engine);
+    // this._wrap(engine);
+    this._bounce(engine)
   }
 
   public orderMoveTo(pos: ex.Vector | ex.Actor) {
@@ -155,18 +156,37 @@ autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
     this.angularVelocity = ex.clamp(this.angularVelocity, -Config.PlayerMaxAngularVelocity, Config.PlayerMaxAngularVelocity);
   }
 
-  private _wrap(engine: ex.Engine) {
+  // private _wrap(engine: ex.Engine) {
+  //   if (this.pos.x < -this.map.hexWidth / 2) {
+  //     this.pos.x += this.map.gridWidth;
+  //   }
+  //   if (this.pos.x > this.map.gridWidth - this.map.hexWidth / 2) {
+  //     this.pos.x -= this.map.gridWidth;
+  //   }
+  //   if (this.pos.y < -this.map.hexHeight * 0.75) {
+  //     this.pos.y += this.map.gridHeight;
+  //   }
+  //   if (this.pos.y > this.map.gridHeight - this.map.hexHeight * 0.75) {
+  //     this.pos.y -= this.map.gridHeight;
+  //   }
+  // }
+
+  private _bounce(engine: ex.Engine) {
+    if (this.acc.x === 0 && this.acc.y === 0) {
+      return;
+    }
+    const bounceStrength = 2;
     if (this.pos.x < -this.map.hexWidth / 2) {
-      this.pos.x += this.map.gridWidth;
+      this.acc.x += Math.abs(this.pos.x - (-this.map.hexWidth / 2)) * bounceStrength;
     }
     if (this.pos.x > this.map.gridWidth - this.map.hexWidth / 2) {
-      this.pos.x -= this.map.gridWidth;
+      this.acc.x -= Math.abs(this.pos.x - (this.map.gridWidth - this.map.hexWidth / 2)) * bounceStrength;
     }
     if (this.pos.y < -this.map.hexHeight * 0.75) {
-      this.pos.y += this.map.gridHeight;
+      this.acc.y += Math.abs(this.pos.y - (-this.map.hexHeight * 0.75)) * bounceStrength;
     }
     if (this.pos.y > this.map.gridHeight - this.map.hexHeight * 0.75) {
-      this.pos.y -= this.map.gridHeight;
+      this.acc.y -= Math.abs(this.pos.y - (this.map.gridHeight - this.map.hexHeight * 0.75)) * bounceStrength;
     }
   }
 

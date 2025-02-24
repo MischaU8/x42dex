@@ -16,6 +16,7 @@ export class StaticSpaceObject extends ex.Actor {
       width: Config.StaticSpaceObjectWidth,
       height: Config.StaticSpaceObjectHeight,
       color,
+      z: 5,
     });
     this.image = image;
   }

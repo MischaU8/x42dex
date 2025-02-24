@@ -50,7 +50,9 @@ export class MyLevel extends ex.Scene {
         this.world.remove(this.world.get(ex.MotionSystem));
         this.world.add(this.pausableMotionSystem);
 
-        this.setupParallaxBackground();
+        if (Config.Background) {
+            this.setupParallaxBackground();
+        }
 
         this.add(this.map);
         this.add(this.statusLabel);

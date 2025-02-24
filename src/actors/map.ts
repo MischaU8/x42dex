@@ -1,5 +1,6 @@
 import * as ex from "excalibur";
 import { Hexagon } from "./hexagon";
+import { Config } from "../config";
 
 import { hex_to_pixel, pixel_to_flat_hex } from "../hex_tools";
 
@@ -145,7 +146,7 @@ export class Map extends ex.Actor {
     }
 
     visitTile(actor: ex.Actor, [q, r]: [number, number]) {
-        if (!this.isQRInMap(q, r)) {
+        if (!Config.FogOfWar || !this.isQRInMap(q, r)) {
             return;
         }
         const key = `hex_${q}_${r}`;

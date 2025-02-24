@@ -44,6 +44,7 @@ game.input.pointers.primary.on('wheel', (wheelEvent) => {
     } else {
       game.currentScene.camera.zoom /= Config.ZoomWheelFactor;
     }
+    game.currentScene.camera.zoom = ex.clamp(game.currentScene.camera.zoom, Config.MinZoom, Config.MaxZoom);
 });
 
 game.start('start', { // name of the start scene 'start'

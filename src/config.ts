@@ -1,21 +1,29 @@
 // config.ts
 
+const worldSize = 3;
+
 export const Config = {
 
     Seed: 42,
 
-    MapCols: 20,
-    MapRows: 11,
+    MapCols: Math.floor(20 * worldSize),
+    MapRows: Math.floor(11 * worldSize),
     MapSize: 48,
     MapPadding: 1,
+
+    FogOfWar: true,
+    Background: true,
 
     FontSize: 20,
     InitialZoom: 1,
     ZoomWheelFactor: 1.05,
+    MinZoom: 0.35,
+    MaxZoom: 2.0,
+    MinShipVisibilityZoom: 0.5,
 
-    NumStations: 5,
-    NumAstroids: 25,
-    NumShips: 15,
+    NumStations: Math.floor(5 * worldSize * worldSize),
+    NumAstroids: Math.floor(25 * worldSize * worldSize),
+    NumShips: Math.floor(15 * worldSize * worldSize),
 
     StaticSpaceObjectWidth: 32,
     StaticSpaceObjectHeight: 32,

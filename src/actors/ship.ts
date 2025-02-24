@@ -82,8 +82,6 @@ export class Ship extends ex.Actor {
     });
   }
 
-
-
   public getDetails() {
     return `--[${this.name}]--
    hex ${this.tileQR[0]},${this.tileQR[1]}
@@ -107,6 +105,8 @@ autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
   }
 
   public onPreUpdate(engine: ex.Engine, delta: number) {
+    this.graphics.isVisible = engine.currentScene.camera.zoom >= Config.MinShipVisibilityZoom;
+
     if (this.motionSystem.paused) {
       return;
     }

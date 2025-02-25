@@ -1,7 +1,6 @@
 import * as ex from "excalibur";
 import { Hexagon } from "./hexagon";
 import { Config } from "../config";
-
 import { hex_to_pixel, pixel_to_flat_hex } from "../hex_tools";
 
 const MAP_FOG_COLORS = [

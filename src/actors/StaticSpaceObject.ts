@@ -46,11 +46,11 @@ export class StaticSpaceObject extends ex.Actor {
     });
   }
 
-  public select() {
+  public highlight() {
     this.graphics.material!.color = ex.Color.Yellow;
   }
 
-  public deselect() {
+  public unhighlight() {
     this.graphics.material!.color = this.color;
   }
 }

@@ -96,11 +96,11 @@ autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
    target ${this.get(AutopilotComponent)?.getTargetDetails()}`;
   }
 
-  public select() {
+  public highlight() {
     this.graphics.material!.color = ex.Color.Yellow;
   }
 
-  public deselect() {
+  public unhighlight() {
     this.graphics.material!.color = this.color;
   }
 

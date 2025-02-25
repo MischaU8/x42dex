@@ -14,7 +14,7 @@ import { Map } from "../actors/map";
 import { Player } from "../actors/player";
 import { Ship, ShipEvents, ShipStatusEvent } from "../actors/ship";
 import { StaticSpaceObject } from "../actors/StaticSpaceObject";
-
+import { Cursor } from "../actors/cursor";
 import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 import { MinableComponent } from "../components/minable";
 import { StationComponent } from "../components/station";
@@ -27,9 +27,9 @@ export class MyLevel extends ex.Scene {
     map = new Map(this.random, Config.MapCols, Config.MapRows, Config.MapSize, Config.MapPadding);
     player = new Player('Player', Resources.ShipF, ex.Color.Green, this.map);
     staticObjects: StaticSpaceObject[] = [];
+    cursor!: Cursor;
     pausableMotionSystem = new PausableMotionSystem(this.world, this.physics);
 
-    selectedActor: ex.Actor | null = null;
     following = false;
     statusLabel = new ex.Label({
         text: '',
@@ -62,6 +62,10 @@ export class MyLevel extends ex.Scene {
         this.spawnStations();
         this.spawnAstroids();
         this.spawnShips();
+
+        this.cursor = new Cursor('cursor', this.player);
+        this.add(this.cursor);
+        this.actorDetails.setTarget(this.player);
 
         this.registerEvents(engine);
     }
@@ -102,7 +106,8 @@ export class MyLevel extends ex.Scene {
                 return;
             }
             if (evt.button === ex.PointerButton.Left) {
-                this.map.onClick(evt.worldPos);
+                //this.map.onClick(evt.worldPos);
+                this.deselectAny();
             } else if (evt.button === ex.PointerButton.Right) {
                 this.player.orderMoveTo(evt.worldPos);
             }
@@ -119,15 +124,15 @@ export class MyLevel extends ex.Scene {
                 }
             } else if (evt.key === ex.Keys.Escape) {
                 this.deselectAny();
-                this.selectedActor = null;
+                this.cursor.target = null;
             } else if (evt.key === ex.Keys.F) {
                 if (this.following) {
                     this.engine.currentScene.camera.clearAllStrategies();
                     this.setStatusLabel('Unfollowing', 1000);
                     this.following = false;
-                } else if (this.selectedActor instanceof Ship) {
-                    this.engine.currentScene.camera.strategy.lockToActor(this.selectedActor as Ship);
-                    this.setStatusLabel(`Following ${this.selectedActor.name}`, 1000);
+                } else if (this.cursor.target instanceof Ship) {
+                    this.engine.currentScene.camera.strategy.lockToActor(this.cursor.target as Ship);
+                    this.setStatusLabel(`Following ${this.cursor.target.name}`, 1000);
                     this.following = true;
                 }
             }
@@ -198,14 +203,14 @@ export class MyLevel extends ex.Scene {
 
     private spawnStations() {
         for (let i = 0; i < Config.NumStations; i++) {
-            const pos = this.getRandomPosWithMinDistance();
+            const pos = this.getRandomPosWithMinDistance(64 * Config.WorldSize);
             if (pos.equals(ex.Vector.Zero)) {
                 console.log('Failed to get a valid position for station', i);
                 break;
             }
 
             const stationImage = this.random.pickOne([Resources.StationA, Resources.StationB]);
-            const stationColor = this.random.pickOne([ex.Color.ExcaliburBlue, ex.Color.Vermilion]);
+            const stationColor = this.random.pickOne([ex.Color.ExcaliburBlue, ex.Color.Teal]);
             const station = new StaticSpaceObject(`Station ${i}`, stationImage, stationColor, pos);
             station.addComponent(new StationComponent());
             station.addComponent(new CargoComponent(100_000));
@@ -225,61 +230,46 @@ export class MyLevel extends ex.Scene {
     private deselectAny() {
         this.map.deselectHexagon();
         this.actorDetails.resetTarget();
-        if (this.selectedActor) {
-            if (this.selectedActor instanceof Ship) {
-                (this.selectedActor as Ship).deselect();
-            } else if (this.selectedActor instanceof StaticSpaceObject) {
-                (this.selectedActor as StaticSpaceObject).deselect();
-            } else {
-                console.error('Unknown actor type', this.selectedActor);
-            }
-        }
     }
 
     private onSelectAstroid(astroid: StaticSpaceObject) {
         this.deselectAny();
-        if (this.selectedActor === astroid) {
-            this.selectedActor = null;
+        if (this.cursor.target === astroid) {
+            this.cursor.target = null;
             console.log('Deselected astroid', astroid.name);
             this.setStatusLabel(`Deselected ${astroid.name}`);
-            astroid.deselect();
         } else {
-            this.selectedActor = astroid;
+            this.cursor.target = astroid;
             console.log('Selected astroid', astroid.name);
             this.setStatusLabel(`Selected ${astroid.name}`);
-            astroid.select();
             this.actorDetails.setTarget(astroid);
         }
     }
 
     private onSelectStation(station: StaticSpaceObject) {
         this.deselectAny();
-        if (this.selectedActor === station) {
-            this.selectedActor = null;
+        if (this.cursor.target === station) {
+            this.cursor.target = null;
             console.log('Deselected station', station.name);
             this.setStatusLabel(`Deselected ${station.name}`);
-            station.deselect();
         } else {
-            this.selectedActor = station;
+            this.cursor.target = station;
             console.log('Selected station', station.name);
             this.setStatusLabel(`Selected ${station.name}`);
-            station.select();
             this.actorDetails.setTarget(station);
         }
     }
 
     private onSelectShip(ship: Ship) {
         this.deselectAny();
-        if (this.selectedActor === ship) {
-            this.selectedActor = null;
+        if (this.cursor.target === ship) {
+            this.cursor.target = null;
             console.log('Deselected ship', ship.name);
             this.setStatusLabel(`Deselected ${ship.name}`);
-            ship.deselect();
         } else {
-            this.selectedActor = ship;
+            this.cursor.target = ship;
             console.log('Selected ship', ship.name);
             this.setStatusLabel(`Selected ${ship.name}`);
-            ship.select();
             this.actorDetails.setTarget(ship);
         }
     }

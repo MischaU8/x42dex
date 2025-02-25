@@ -8,15 +8,21 @@ import { MinableComponent } from './minable';
 import { ShipTarget } from './autopilot';
 
 import { WaresType } from '../data/wares';
+import { WalletComponent } from './wallet';
+import { StaticSpaceObject } from '../actors/StaticSpaceObject';
 
 export class AutominerComponent extends ex.Component {
     declare owner: Ship;
     declare level: MyLevel;
 
     mineAmount: number = 100;
+    unloadAmount: number = 100;
     unloadThreshold: number = 0.5;
     topNAstroids: number = 5;
     topNStations: number = 2;
+
+    rangeMultiplier: number = 1;
+    excludeTargets: ex.Actor[] = [];
 
     enabled: boolean = true;
     target: ex.Actor | null = null;
@@ -31,6 +37,7 @@ export class AutominerComponent extends ex.Component {
           },
           FIND_ASTROID: {
             onEnter: this.onFindAstroidEnter.bind(this),
+            onUpdate: this.onFindAstroidUpdate.bind(this),
             transitions: ['MINE_ASTROID', 'IDLE']
           },
           MINE_ASTROID: {
@@ -39,6 +46,7 @@ export class AutominerComponent extends ex.Component {
           },
           FIND_STATION: {
             onEnter: this.onFindStationEnter.bind(this),
+            onUpdate: this.onFindStationUpdate.bind(this),
             transitions: ['DELIVER_CARGO', 'IDLE']
           },
           DELIVER_CARGO: {
@@ -48,10 +56,11 @@ export class AutominerComponent extends ex.Component {
         }
     })
 
-    constructor(level: MyLevel, mineAmount: number = 100, unloadThreshold: number = 0.5, topNAstroids: number = 5, topNStations: number = 2) {
+    constructor(level: MyLevel, mineAmount: number = 100, unloadAmount: number = 100, unloadThreshold: number = 0.5, topNAstroids: number = 5, topNStations: number = 2) {
         super();
         this.level = level;
         this.mineAmount = mineAmount;
+        this.unloadAmount = unloadAmount;
         this.unloadThreshold = unloadThreshold;
         this.topNAstroids = topNAstroids;
         this.topNStations = topNStations;
@@ -85,7 +94,7 @@ export class AutominerComponent extends ex.Component {
     }
 
     getDetails(): string {
-        return `${this.machine.currentState.name}`;
+        return `${this.machine.currentState.name} (${this.rangeMultiplier}x)`;
     }
 
     onIdleUpdate(_data: unknown, elapsed: number) {
@@ -100,14 +109,65 @@ export class AutominerComponent extends ex.Component {
 
     onFindAstroidEnter() {
         // console.log(this.owner.name, 'find astroid');
-        this.target = this.level.getNearbyStaticObjectWithComponent(this.owner, MinableComponent, this.topNAstroids, this.target);
+        this.rangeMultiplier = 2;
+        this.excludeTargets = [];
+        if (this.target) {
+            this.excludeTargets.push(this.target);
+        }
+        this.target = null;
+    }
+
+    onFindAstroidUpdate(_data: unknown, elapsed: number) {
+        if (this.target) {
+            return;
+        }
+        const candidates = this.getNearbyAstroids();
+        if (candidates.length === 0) {
+            // console.log(this.owner.name, 'no useful astroids in range, increasing range');
+            this.rangeMultiplier += 1;
+            return;
+        }
+        this.target = this.getNearbyStaticObject(candidates, this.topNAstroids);
         this.owner.orderMoveTo(this.target);
+    }
+
+    getNearbyAstroids(): StaticSpaceObject[] {
+        const maxRange = this.rangeMultiplier * this.owner.sensorRadius;
+        return this.level.staticObjects.filter(obj => obj.has(MinableComponent) && !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange && obj.get(MinableComponent)?.amount >= this.mineAmount);
     }
 
     onFindStationEnter() {
         // console.log(this.owner.name, 'find station');
-        this.target = this.level.getNearbyStaticObjectWithComponent(this.owner, StationComponent, this.topNStations, this.target);
+        this.rangeMultiplier = 2;
+        this.excludeTargets = [];
+        if (this.target) {
+            this.excludeTargets.push(this.target);
+        }
+        this.target = null;
+    }
+
+    onFindStationUpdate(_data: unknown, elapsed: number) {
+        if (this.target) {
+            return;
+        }
+        const candidates = this.getNearbyStations();
+        if (candidates.length === 0) {
+            // console.log(this.owner.name, 'no useful stations in range, increasing range');
+            this.rangeMultiplier += 1;
+            return;
+        }
+        this.target = this.getNearbyStaticObject(candidates, this.topNStations);
         this.owner.orderMoveTo(this.target);
+    }
+
+    getNearbyStations(): StaticSpaceObject[] {
+        const maxRange = this.rangeMultiplier * this.owner.sensorRadius;
+        return this.level.staticObjects.filter(obj => obj.has(StationComponent) && !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange && obj.get(WalletComponent)?.balance >= 1000);
+    }
+
+    getNearbyStaticObject(candidates: StaticSpaceObject[], topN: number = 1): StaticSpaceObject {
+        const sortedObjects = candidates.sort((a, b) => this.owner.pos.distance(a.pos) - this.owner.pos.distance(b.pos));
+        return this.level.random.pickOne(sortedObjects.slice(0, topN));
     }
 
     onStoppedAt(where: ShipTarget) {
@@ -158,17 +218,26 @@ export class AutominerComponent extends ex.Component {
             return;
         }
         // console.log(this.owner.name, 'deliver cargo', elapsed);
+        const station = this.target.get(StationComponent);
         const stationCargo = this.target.get(CargoComponent);
+        const stationWallet = this.target.get(WalletComponent);
         const shipCargo = this.owner.get(CargoComponent);
+        const shipWallet = this.owner.get(WalletComponent);
         for (const [item, amount] of Object.entries(shipCargo.items)) {
-            const space = stationCargo.getAvailableSpaceFor(item as WaresType);
-            const transferAmount = Math.min(space, amount);
+            const shipTransferAmount = Math.floor(Math.min(this.unloadAmount * elapsed / 1000, amount));
+            const stationSpace = stationCargo.getAvailableSpaceFor(item as WaresType);
+            const price = station.getPriceQuote(item as WaresType, amount);
+            const stationCanAfford = Math.floor(stationWallet.balance / price);
+            const stationTransferAmount = Math.floor(Math.min(stationSpace, stationCanAfford));
+            const transferAmount = Math.min(shipTransferAmount, stationTransferAmount);
             if (transferAmount > 0) {
                 stationCargo.addItem(item as WaresType, transferAmount);
                 shipCargo.removeItem(item as WaresType, transferAmount);
+                stationWallet.balance -= transferAmount * price;
+                shipWallet.balance += transferAmount * price;
                 // console.log(this.owner.name, 'transferred', transferAmount, 'of', item, 'to station');
+                return;
             } else {
-                console.log(this.owner.name, 'no space at station for', item, 'so stopping transfer');
                 break;
             }
         }

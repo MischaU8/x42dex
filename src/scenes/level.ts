@@ -21,6 +21,7 @@ import { StationComponent } from "../components/station";
 import { AutopilotComponent } from "../components/autopilot";
 import { CargoComponent } from "../components/cargo";
 import { AutominerComponent } from "../components/autominer";
+import { WalletComponent } from "../components/wallet";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
@@ -75,6 +76,7 @@ export class MyLevel extends ex.Scene {
         engine.currentScene.camera.pos = this.player.pos;
         this.player.addComponent(new AutopilotComponent());
         this.player.addComponent(new CargoComponent());
+        this.player.addComponent(new WalletComponent(1000));
         this.add(this.player);
 
         this.player.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
@@ -107,7 +109,7 @@ export class MyLevel extends ex.Scene {
             }
             if (evt.button === ex.PointerButton.Left) {
                 //this.map.onClick(evt.worldPos);
-                this.deselectAny();
+                // this.deselectAny();
             } else if (evt.button === ex.PointerButton.Right) {
                 this.player.orderMoveTo(evt.worldPos);
             }
@@ -152,9 +154,11 @@ export class MyLevel extends ex.Scene {
             // ship.graphics.isVisible = false;
             ship.pos = pos;
             ship.addComponent(new CargoComponent());
+            ship.addComponent(new WalletComponent());
             ship.addComponent(new AutopilotComponent());
             ship.addComponent(new AutominerComponent(this,
                 this.random.integer(Config.AutoMinerMinMineAmount, Config.AutoMinerMaxMineAmount),
+                this.random.integer(Config.AutoMinerMinUnloadAmount, Config.AutoMinerMaxUnloadAmount),
                 this.random.floating(Config.AutoMinerMinUnloadThreshold, Config.AutoMinerMaxUnloadThreshold),
                 this.random.integer(Config.AutoMinerMinTopNAstroids, Config.AutoMinerMaxTopNAstroids),
                 this.random.integer(Config.AutoMinerMinTopNStations, Config.AutoMinerMaxTopNStations)));
@@ -212,8 +216,9 @@ export class MyLevel extends ex.Scene {
             const stationImage = this.random.pickOne([Resources.StationA, Resources.StationB]);
             const stationColor = this.random.pickOne([ex.Color.ExcaliburBlue, ex.Color.Teal]);
             const station = new StaticSpaceObject(`Station ${i}`, stationImage, stationColor, pos);
-            station.addComponent(new StationComponent());
-            station.addComponent(new CargoComponent(100_000));
+            station.addComponent(new StationComponent(this.random));
+            station.addComponent(new CargoComponent(Config.StationMaxVolume));
+            station.addComponent(new WalletComponent(this.random.integer(Config.StationMinInitialBalance, Config.StationMaxInitialBalance)));
             this.add(station);
             this.staticObjects.push(station);
 
@@ -300,8 +305,8 @@ export class MyLevel extends ex.Scene {
         }
     }
 
-    public getNearbyStaticObjectWithComponent(source: ex.Actor, component: ex.ComponentCtor<ex.Component>, topN: number = 1, exclude: ex.Actor | null = null): StaticSpaceObject {
-        const objects = this.staticObjects.filter(obj => obj.has(component) && obj !== exclude);
+    public getNearbyStaticObjectWithComponent(source: ex.Actor, component: ex.ComponentCtor<ex.Component>, topN: number = 1, maxRange: number = 128, exclude: ex.Actor[] = []): StaticSpaceObject {
+        const objects = this.staticObjects.filter(obj => obj.has(component) && !exclude.includes(obj) && source.pos.distance(obj.pos) <= maxRange);
         const sortedObjects = objects.sort((a, b) => source.pos.distance(a.pos) - source.pos.distance(b.pos));
         return this.random.pickOne(sortedObjects.slice(0, topN));
     }

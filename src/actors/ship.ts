@@ -7,6 +7,8 @@ import * as gev from "../gameevents";
 import { AutopilotComponent, ShipTarget } from "../components/autopilot";
 import { CargoComponent } from "../components/cargo";
 import { AutominerComponent } from "../components/autominer";
+import { WalletComponent } from "../components/wallet";
+
 export type ShipEvents = {
   status: ShipStatusEvent;
   stopped: ShipStoppedEvent;
@@ -92,6 +94,7 @@ export class Ship extends ex.Actor {
    vel ${this.vel.magnitude.toFixed(0).padStart(3, "0")}m/s
    acc ${this.acc.magnitude.toFixed(0).padStart(3, "0")}m/s²
 
+wallet ${this.get(WalletComponent)?.getDetails()}
  cargo ${this.get(CargoComponent)?.getDetails()}
 
 autominer ${this.get(AutominerComponent)?.getDetails() || 'off'}

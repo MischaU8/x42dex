@@ -37,9 +37,16 @@ export const Config = {
     PlayerMaxDeceleration: 169,
     PlayerMaxAngularVelocity: 1.17, // 67 degrees per second
 
+    // station
+    StationMaxVolume: 100_000,
+    StationMinInitialBalance: 100_000,
+    StationMaxInitialBalance: 1_000_000,
+
     // autominer
     AutoMinerMinMineAmount: 10,
     AutoMinerMaxMineAmount: 50,
+    AutoMinerMinUnloadAmount: 10,
+    AutoMinerMaxUnloadAmount: 50,
     AutoMinerMinUnloadThreshold: 0.5,
     AutoMinerMaxUnloadThreshold: 0.9,
     AutoMinerMinTopNAstroids: 3,

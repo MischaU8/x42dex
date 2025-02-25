@@ -4,15 +4,17 @@ const worldSize = 3;
 
 export const Config = {
 
-    Seed: 42,
+    Seed: 41,
 
+    WorldSize: worldSize,
     MapCols: Math.floor(20 * worldSize),
     MapRows: Math.floor(11 * worldSize),
     MapSize: 48,
     MapPadding: 1,
 
     FogOfWar: true,
-    Background: true,
+    Background: false,
+    DrawSensors: false,
 
     FontSize: 20,
     InitialZoom: 1,

@@ -36,6 +36,9 @@ export class Ship extends ex.Actor {
   image: ex.ImageSource;
   tileQR: [number | null, number | null] = [null, null];
 
+  sensorRadius: number = 128;
+  scanRadius: number = 4 * 128;
+
   motionSystem!: PausableMotionSystem;
 
   constructor(name: string, image: ex.ImageSource, color: ex.Color, map: Map) {

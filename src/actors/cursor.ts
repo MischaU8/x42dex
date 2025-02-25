@@ -1,4 +1,6 @@
 import * as ex from "excalibur";
+import { Ship } from "./ship";
+import { Config } from "../config";
 
 export class Cursor extends ex.Actor {
 
@@ -32,6 +34,13 @@ export class Cursor extends ex.Actor {
             gfx.drawLine(this.roundVec(pos.x, pos.y+height/2 + margin), this.roundVec(pos.x, gfx.height), this.lineColor, this.lineWidth);
             gfx.drawLine(this.roundVec(0, pos.y), this.roundVec(pos.x-width/2 - margin, pos.y), this.lineColor, this.lineWidth);
             gfx.drawLine(this.roundVec(pos.x+width/2 + margin, pos.y), this.roundVec(gfx.width, pos.y), this.lineColor, this.lineWidth);
+
+
+            if (Config.DrawSensors && this.target instanceof Ship) {
+                gfx.drawCircle(pos, this.target.sensorRadius * scale, ex.Color.Transparent, ex.Color.Yellow, .1);
+                gfx.drawCircle(pos, this.target.scanRadius * scale, ex.Color.Transparent, ex.Color.Brown, .1);
+            }
+
             gfx.restore();
         }
     }

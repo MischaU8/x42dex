@@ -7,10 +7,11 @@ export class CargoComponent extends ex.Component {
     items: Record<WaresType, number> = {} as Record<WaresType, number>;
     volume: number = 0;
     maxVolume: number = 0;
-
-    constructor(maxVolume: number = 1000) {
+    resourceFilter: WaresType[] = [];
+    constructor(maxVolume: number = 0, resourceFilter: WaresType[] = []) {
         super();
         this.maxVolume = maxVolume;
+        this.resourceFilter = resourceFilter;
     }
 
     addItem(item: WaresType, amount: number) {

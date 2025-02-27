@@ -21,6 +21,7 @@ export class AutominerComponent extends ex.Component {
     topNAstroids: number = 5;
     topNStations: number = 2;
 
+    initialRangeMultiplier: number = 1;
     rangeMultiplier: number = 1;
     excludeTargets: ex.Actor[] = [];
 
@@ -56,7 +57,7 @@ export class AutominerComponent extends ex.Component {
         }
     })
 
-    constructor(level: MyLevel, mineAmount: number = 100, unloadAmount: number = 100, unloadThreshold: number = 0.5, topNAstroids: number = 5, topNStations: number = 2) {
+    constructor(level: MyLevel, mineAmount: number = 100, unloadAmount: number = 100, unloadThreshold: number = 0.5, topNAstroids: number = 5, topNStations: number = 2, initialRangeMultiplier: number = 1) {
         super();
         this.level = level;
         this.mineAmount = mineAmount;
@@ -64,6 +65,7 @@ export class AutominerComponent extends ex.Component {
         this.unloadThreshold = unloadThreshold;
         this.topNAstroids = topNAstroids;
         this.topNStations = topNStations;
+        this.initialRangeMultiplier = initialRangeMultiplier;
     }
 
     onAdd(owner: ex.Actor): void {
@@ -109,7 +111,7 @@ export class AutominerComponent extends ex.Component {
 
     onFindAstroidEnter() {
         // console.log(this.owner.name, 'find astroid');
-        this.rangeMultiplier = 2;
+        this.rangeMultiplier = this.initialRangeMultiplier;
         this.excludeTargets = [];
         if (this.target) {
             this.excludeTargets.push(this.target);
@@ -133,12 +135,13 @@ export class AutominerComponent extends ex.Component {
 
     getNearbyAstroids(): StaticSpaceObject[] {
         const maxRange = this.rangeMultiplier * this.owner.sensorRadius;
-        return this.level.staticObjects.filter(obj => obj.has(MinableComponent) && !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange && obj.get(MinableComponent)?.amount >= this.mineAmount);
+        const cargo = this.owner.get(CargoComponent);
+        return this.level.staticObjects.filter(obj => obj.has(MinableComponent) && cargo.resourceFilter.includes(obj.get(MinableComponent)?.type) && !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange && obj.get(MinableComponent)?.amount >= this.mineAmount);
     }
 
     onFindStationEnter() {
         // console.log(this.owner.name, 'find station');
-        this.rangeMultiplier = 2;
+        this.rangeMultiplier = this.initialRangeMultiplier;
         this.excludeTargets = [];
         if (this.target) {
             this.excludeTargets.push(this.target);

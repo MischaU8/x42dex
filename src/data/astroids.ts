@@ -29,7 +29,7 @@ export const AstroidTypes = {
         minAmount: 100,
         maxAmount: 1000,
         image: Resources.AstroidC,
-        color: ex.Color.White
+        color: ex.Color.Azure
     },
     [MinableWares.helium]: {
         name: 'Helium',
@@ -56,7 +56,7 @@ export const AstroidTypes = {
         minAmount: 100,
         maxAmount: 1000,
         image: Resources.AstroidD,
-        color: ex.Color.Green
+        color: ex.Color.Chartreuse
     }
 } as const;
 

@@ -25,6 +25,15 @@ export const Resources = {
   AstroidF: new ImageSource('./images/kenney_simple-space/PNG/Default/meteor_squareDetailedSmall.png'),
   AstroidG: new ImageSource('./images/kenney_simple-space/PNG/Default/meteor_squareLarge.png'),
   AstroidH: new ImageSource('./images/kenney_simple-space/PNG/Default/meteor_squareSmall.png'),
+  EnemyA: new ImageSource('./images/kenney_simple-space/PNG/Default/enemy_A.png'),
+  EnemyB: new ImageSource('./images/kenney_simple-space/PNG/Default/enemy_B.png'),
+  EnemyC: new ImageSource('./images/kenney_simple-space/PNG/Default/enemy_C.png'),
+  EnemyD: new ImageSource('./images/kenney_simple-space/PNG/Default/enemy_D.png'),
+  EnemyE: new ImageSource('./images/kenney_simple-space/PNG/Default/enemy_E.png'),
+  SatelliteA: new ImageSource('./images/kenney_simple-space/PNG/Default/satellite_A.png'),
+  SatelliteB: new ImageSource('./images/kenney_simple-space/PNG/Default/satellite_B.png'),
+  SatelliteC: new ImageSource('./images/kenney_simple-space/PNG/Default/satellite_C.png'),
+  SatelliteD: new ImageSource('./images/kenney_simple-space/PNG/Default/satellite_D.png'),
   ShipA: new ImageSource('./images/kenney_simple-space/PNG/Default/ship_A.png'),
   ShipB: new ImageSource('./images/kenney_simple-space/PNG/Default/ship_B.png'),
   ShipC: new ImageSource('./images/kenney_simple-space/PNG/Default/ship_C.png'),
@@ -36,11 +45,11 @@ export const Resources = {
   ShipI: new ImageSource('./images/kenney_simple-space/PNG/Default/ship_I.png'),
   ShipJ: new ImageSource('./images/kenney_simple-space/PNG/Default/ship_J.png'),
   ShipK: new ImageSource('./images/kenney_simple-space/PNG/Default/ship_K.png'),
-  ShipL: new ImageSource('./images/kenney_simple-space/PNG/Default/ship_L.png'),  
+  ShipL: new ImageSource('./images/kenney_simple-space/PNG/Default/ship_L.png'),
   StationA: new ImageSource('./images/kenney_simple-space/PNG/Default/station_A.png'),
   StationB: new ImageSource('./images/kenney_simple-space/PNG/Default/station_B.png'),
   StationC: new ImageSource('./images/kenney_simple-space/PNG/Default/station_C.png'),
-} as const; // the 'as const' is a neat typescript trick to get strong typing on your resources. 
+} as const; // the 'as const' is a neat typescript trick to get strong typing on your resources.
 
 export const loader = new Loader();
 for (const res of Object.values(Resources)) {

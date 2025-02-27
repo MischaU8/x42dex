@@ -22,6 +22,8 @@ import { AutopilotComponent } from "../components/autopilot";
 import { CargoComponent } from "../components/cargo";
 import { AutominerComponent } from "../components/autominer";
 import { WalletComponent } from "../components/wallet";
+import { DefaultShipConfigs } from "../data/ships";
+import { AutoscoutComponent } from "../components/autoscout";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
@@ -142,35 +144,61 @@ export class MyLevel extends ex.Scene {
     }
 
     private spawnShips() {
-        for (let i = 0; i < Config.NumShips; i++) {
-            const shipImage = this.random.pickOne([Resources.ShipA, Resources.ShipB, Resources.ShipC, Resources.ShipD, Resources.ShipE]);
-            const shipColor = this.random.pickOne([ex.Color.Magenta, ex.Color.Orange, ex.Color.Violet, ex.Color.Red]);
-            const pos = this.getRandomPosWithMinDistance();
-            if (pos.equals(ex.Vector.Zero)) {
-                console.log('Failed to get a valid position for ship', i);
-                break;
+        for (const config of DefaultShipConfigs) {
+            for (let i = 0; i < config.count; i++) {
+                const shipImage = this.random.pickOne(config.possibleImages);
+                const shipColor = this.random.pickOne(config.possibleColors);
+                const pos = this.getRandomPosWithMinDistance();
+
+                if (pos.equals(ex.Vector.Zero)) {
+                    console.log(`Failed to get a valid position for ${config.name} ship ${i}`);
+                    break;
+                }
+
+                const ship = new Ship(`${config.name} ${i}`, shipImage, shipColor, this.map);
+                ship.pos = pos;
+                ship.rotation = this.random.floating(0, Math.PI * 2);
+
+                // Add components based on configuration
+                if (config.components.cargo) {
+                    ship.addComponent(new CargoComponent(config.components.cargo.maxVolume, config.components.cargo.resourceFilter));
+                }
+
+                if (config.components.wallet) {
+                    ship.addComponent(new WalletComponent(config.components.wallet.initialBalance));
+                }
+
+                if (config.components.autopilot) {
+                    ship.addComponent(new AutopilotComponent());
+                }
+
+                if (config.components.autominer) {
+                    const am = config.components.autominer;
+                    ship.addComponent(new AutominerComponent(this,
+                        this.random.integer(am.minMineAmount!, am.maxMineAmount!),
+                        this.random.integer(am.minUnloadAmount!, am.maxUnloadAmount!),
+                        this.random.floating(am.minUnloadThreshold!, am.maxUnloadThreshold!),
+                        this.random.integer(am.minTopNAstroids!, am.maxTopNAstroids!),
+                        this.random.integer(am.minTopNStations!, am.maxTopNStations!),
+                        am.initialRangeMultiplier!
+                    ));
+                }
+
+                if (config.components.autoscout) {
+                    ship.addComponent(new AutoscoutComponent(this, config.components.autoscout.topNObjects, config.components.autoscout.rememberNObjects, config.components.autoscout.initialRangeMultiplier));
+                }
+
+                this.add(ship);
+
+                // Add event listeners
+                ship.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
+                    this.onSelectShip(evt.target as Ship);
+                });
+
+                ship.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
+                    this.onTargetShip(evt.target as Ship);
+                });
             }
-            const ship = new Ship(`Ship ${i}`, shipImage, shipColor, this.map);
-            // ship.graphics.isVisible = false;
-            ship.pos = pos;
-            ship.addComponent(new CargoComponent());
-            ship.addComponent(new WalletComponent());
-            ship.addComponent(new AutopilotComponent());
-            ship.addComponent(new AutominerComponent(this,
-                this.random.integer(Config.AutoMinerMinMineAmount, Config.AutoMinerMaxMineAmount),
-                this.random.integer(Config.AutoMinerMinUnloadAmount, Config.AutoMinerMaxUnloadAmount),
-                this.random.floating(Config.AutoMinerMinUnloadThreshold, Config.AutoMinerMaxUnloadThreshold),
-                this.random.integer(Config.AutoMinerMinTopNAstroids, Config.AutoMinerMaxTopNAstroids),
-                this.random.integer(Config.AutoMinerMinTopNStations, Config.AutoMinerMaxTopNStations)));
-            this.add(ship);
-
-            ship.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
-                this.onSelectShip(evt.target as Ship);
-            });
-
-            ship.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
-                this.onTargetShip(evt.target as Ship);
-            });
         }
     }
 

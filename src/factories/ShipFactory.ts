@@ -9,6 +9,7 @@ import { WalletComponent } from "../components/wallet";
 import { AutominerComponent } from "../components/autominer";
 import { AutopilotComponent } from "../components/autopilot";
 import { AutoscoutComponent } from "../components/autoscout";
+import { MovementComponent } from "../components/movement";
 
 export class ShipFactory {
     constructor(
@@ -34,6 +35,15 @@ export class ShipFactory {
     }
 
     private addComponents(ship: Ship, config: ShipConfig) {
+        const movement = config.components.movement;
+        if (movement) {
+            ship.addComponent(new MovementComponent(
+                movement.maxVelocity,
+                movement.maxAcceleration,
+                movement.maxDeceleration,
+                movement.maxAngularVelocity
+            ));
+        }
         if (config.components.cargo) {
             const cargo = config.components.cargo;
             ship.addComponent(

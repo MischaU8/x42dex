@@ -32,11 +32,6 @@ export const Config = {
     ShipWidth: 16,
     ShipHeight: 16,
 
-    PlayerMaxVelocity: 321,
-    PlayerMaxAcceleration: 169,
-    PlayerMaxDeceleration: 169,
-    PlayerMaxAngularVelocity: 1.17, // 67 degrees per second
-
     // station
     StationMaxVolume: 100_000,
     StationMinInitialBalance: 100_000,

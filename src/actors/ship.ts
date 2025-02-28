@@ -8,6 +8,7 @@ import { AutopilotComponent, ShipTarget } from "../components/autopilot";
 import { CargoComponent } from "../components/cargo";
 import { AutominerComponent } from "../components/autominer";
 import { WalletComponent } from "../components/wallet";
+import { MovementComponent } from "../components/movement";
 
 export type ShipEvents = {
   status: ShipStatusEvent;
@@ -42,7 +43,7 @@ export class Ship extends ex.Actor {
   scanRadius: number = 4 * 128;
 
   motionSystem!: PausableMotionSystem;
-
+  movement!: MovementComponent;
   constructor(name: string, image: ex.ImageSource, color: ex.Color, map: Map) {
     super({
       name,
@@ -58,7 +59,7 @@ export class Ship extends ex.Actor {
 
   override onInitialize(engine: ex.Engine) {
     this.motionSystem = engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
-
+    this.movement = this.get(MovementComponent) as MovementComponent;
     this.graphics.add(this.image.toSprite({
       destSize: {
         width: this.width,
@@ -157,25 +158,10 @@ autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
   }
 
   private _clamp() {
-    this.acc = this.acc.clampMagnitude(Config.PlayerMaxAcceleration);
-    this.vel = this.vel.clampMagnitude(Config.PlayerMaxVelocity);
-    this.angularVelocity = ex.clamp(this.angularVelocity, -Config.PlayerMaxAngularVelocity, Config.PlayerMaxAngularVelocity);
+    this.acc = this.acc.clampMagnitude(this.movement.maxAcceleration);
+    this.vel = this.vel.clampMagnitude(this.movement.maxVelocity);
+    this.angularVelocity = ex.clamp(this.angularVelocity, -this.movement.maxAngularVelocity, this.movement.maxAngularVelocity);
   }
-
-  // private _wrap(engine: ex.Engine) {
-  //   if (this.pos.x < -this.map.hexWidth / 2) {
-  //     this.pos.x += this.map.gridWidth;
-  //   }
-  //   if (this.pos.x > this.map.gridWidth - this.map.hexWidth / 2) {
-  //     this.pos.x -= this.map.gridWidth;
-  //   }
-  //   if (this.pos.y < -this.map.hexHeight * 0.75) {
-  //     this.pos.y += this.map.gridHeight;
-  //   }
-  //   if (this.pos.y > this.map.gridHeight - this.map.hexHeight * 0.75) {
-  //     this.pos.y -= this.map.gridHeight;
-  //   }
-  // }
 
   private _bounce(engine: ex.Engine) {
     if (this.acc.x === 0 && this.acc.y === 0) {
@@ -217,23 +203,23 @@ autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
   }
 
   public rotateLeft() {
-    this.angularVelocity -= Config.PlayerMaxAngularVelocity;
+    this.angularVelocity -= this.movement.maxAngularVelocity;
   }
 
   public rotateRight() {
-    this.angularVelocity += Config.PlayerMaxAngularVelocity;
+    this.angularVelocity += this.movement.maxAngularVelocity;
   }
 
   public moveForward(level: number = 1) {
     // boost forward in the direction the player is facing
-    this.acc = this.acc.add(ex.Vector.fromAngle(this.rotation - Math.PI / 2).scale(Config.PlayerMaxAcceleration * level));
+    this.acc = this.acc.add(ex.Vector.fromAngle(this.rotation - Math.PI / 2).scale(this.movement.maxAcceleration * level));
   }
 
   public moveBackward(level: number = 1) {
     // const angle = this.vel.angleBetween(this.rotation - Math.PI / 2, RotationType.ShortestPath)
     if (this.vel.magnitude > 0) {
       // break in the direction we are moving
-      this.acc = this.acc.add(this.vel.normalize().scale(-Config.PlayerMaxDeceleration * level));
+      this.acc = this.acc.add(this.vel.normalize().scale(-this.movement.maxDeceleration * level));
     } else {
       // TODO boost backwards
       // this.acc = this.acc.add(Vector.fromAngle(this.rotation + Math.PI / 2).scale(25));

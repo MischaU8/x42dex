@@ -2,7 +2,7 @@ import * as ex from 'excalibur';
 import { PausableMotionSystem } from '../systems/PausableMotionSystem';
 import { Config } from '../config';
 import { Ship } from '../actors/ship';
-
+import { MovementComponent } from './movement';
 export type ShipTarget = ex.Vector | ex.Actor;
 
 
@@ -12,10 +12,12 @@ export class AutopilotComponent extends ex.Component {
     enabled: boolean = false;
     target: ex.Vector | ex.Actor = ex.Vector.Zero;
     motionSystem!: PausableMotionSystem;
+    movement!: MovementComponent;
 
     onAdd(owner: ex.Actor): void {
         owner.on('initialize', (evt: ex.InitializeEvent) => {
             this.motionSystem = evt.engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
+            this.movement = owner.get(MovementComponent) as MovementComponent;
         })
         owner.on('postupdate', this.update.bind(this));
     }
@@ -51,8 +53,8 @@ export class AutopilotComponent extends ex.Component {
         // Calculate how aligned we are with the target (-1 to 1, where 1 is perfectly aligned)
         const alignment = Math.cos(leadDelta.angleBetween(this.owner.rotation - Math.PI / 2, ex.RotationType.ShortestPath));
 
-        const breakingDistance = this.calcBreakingDistance(currentSpeed, Config.PlayerMaxDeceleration);
-        const coastingDistance = this.calcBreakingDistance(currentSpeed, Config.PlayerMaxAcceleration);
+        const breakingDistance = this.calcBreakingDistance(currentSpeed, this.movement.maxDeceleration);
+        const coastingDistance = this.calcBreakingDistance(currentSpeed, this.movement.maxAcceleration);
 
         var maxVelocity = this.calcMaxVelocity(distanceToTarget, alignment);
 
@@ -107,9 +109,9 @@ export class AutopilotComponent extends ex.Component {
         if (distanceToTarget < Config.AutoPilotStoppingDistance) {
             return 0;
         } else if (alignment < 0) {
-            return Config.PlayerMaxVelocity * Config.AutoPilotAlignmentVelocityFactor;
+            return this.movement.maxVelocity * Config.AutoPilotAlignmentVelocityFactor;
         } else {
-            return Config.PlayerMaxVelocity * alignment;
+            return this.movement.maxVelocity * alignment;
         }
     }
 }

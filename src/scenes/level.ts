@@ -11,23 +11,24 @@ import { ActorDetailsPanel } from "../hud/ActorDetailsPanel";
 import { Background } from "../actors/background";
 
 import { Map } from "../actors/map";
-import { Player } from "../actors/player";
-import { Ship, ShipEvents, ShipStatusEvent } from "../actors/ship";
+import { Ship } from "../actors/ship";
 import { StaticSpaceObject } from "../actors/StaticSpaceObject";
 import { Cursor } from "../actors/cursor";
 import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 import { MinableComponent } from "../components/minable";
 import { StationComponent } from "../components/station";
-import { AutopilotComponent } from "../components/autopilot";
 import { CargoComponent } from "../components/cargo";
 import { WalletComponent } from "../components/wallet";
 import { DefaultShipConfigs } from "../data/ships";
 import { ShipFactory } from "../factories/ShipFactory";
+import { ManualFlightComponent } from "../components/manualflight";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
     map = new Map(this.random, Config.MapCols, Config.MapRows, Config.MapSize, Config.MapPadding);
-    player = new Player('Player', Resources.ShipF, ex.Color.Green, this.map);
+
+    // player = new Player('Player', Resources.ShipF, ex.Color.Green, this.map);
+    player!: Ship;
     staticObjects: StaticSpaceObject[] = [];
     cursor!: Cursor;
     pausableMotionSystem = new PausableMotionSystem(this.world, this.physics);
@@ -63,37 +64,15 @@ export class MyLevel extends ex.Scene {
         this.add(this.statusLabel);
         // this.actorDetails.pos.setTo(10, engine.screen.drawHeight-172);
         this.add(this.actorDetails);
-        this.spawnPlayer(engine);
         this.spawnStations();
         this.spawnAstroids();
-        this.spawnShips();
+        this.spawnShips(engine);
 
         this.cursor = new Cursor('cursor', this.player);
         this.add(this.cursor);
         this.actorDetails.setTarget(this.player);
 
         this.registerEvents(engine);
-    }
-
-    private spawnPlayer(engine: ex.Engine<any>) {
-        this.player.pos = ex.vec(this.map.gridWidth / 2, this.map.gridHeight / 2 - this.map.hexHeight / 2);
-        engine.currentScene.camera.pos = this.player.pos;
-        this.player.addComponent(new AutopilotComponent());
-        this.player.addComponent(new CargoComponent());
-        this.player.addComponent(new WalletComponent(1000));
-        this.add(this.player);
-
-        this.player.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
-            this.onSelectShip(evt.target as Ship);
-        });
-
-        this.player.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
-            this.onTargetShip(evt.target as Ship);
-        });
-
-        this.player.events.on(ShipEvents.Status, (evt: ShipStatusEvent) => {
-            this.setStatusLabel(evt.status);
-        });
     }
 
     private setupParallaxBackground() {
@@ -145,7 +124,7 @@ export class MyLevel extends ex.Scene {
         });
     }
 
-    private spawnShips() {
+    private spawnShips(engine: ex.Engine<any>) {
         for (const config of DefaultShipConfigs) {
             for (let i = 0; i < config.count; i++) {
                 const pos = this.getRandomPosWithMinDistance();
@@ -158,12 +137,24 @@ export class MyLevel extends ex.Scene {
                     ...config,
                     index: i
                 });
-                ship.pos = pos;
-                ship.rotation = this.random.floating(0, Math.PI * 2);
-                ship.vel = ex.vec(this.random.integer(-100, 100), this.random.integer(-100, 100));
+
+                if (config.name === 'Player') {
+                    this.setupPlayer(engine, ship);
+                } else {
+                    ship.pos = pos;
+                    ship.rotation = this.random.floating(0, Math.PI * 2);
+                }
                 this.add(ship);
             }
         }
+    }
+
+    private setupPlayer(engine: ex.Engine<any>, ship: Ship) {
+        ship.addComponent(new ManualFlightComponent());
+        ship.pos = ex.vec(this.map.gridWidth / 2, this.map.gridHeight / 2 - this.map.hexHeight / 2);
+        ship.rotation = 0;
+        engine.currentScene.camera.pos = ship.pos;
+        this.player = ship;
     }
 
     private spawnAstroids() {

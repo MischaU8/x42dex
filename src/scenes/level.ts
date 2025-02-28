@@ -27,7 +27,6 @@ export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
     map = new Map(this.random, Config.MapCols, Config.MapRows, Config.MapSize, Config.MapPadding);
 
-    // player = new Player('Player', Resources.ShipF, ex.Color.Green, this.map);
     player!: Ship;
     staticObjects: StaticSpaceObject[] = [];
     cursor!: Cursor;

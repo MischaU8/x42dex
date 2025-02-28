@@ -38,8 +38,8 @@ export const Config = {
     StationMaxInitialBalance: 1_000_000,
 
     // autopilot
-    PlayerLeadTime: 0.5,
-    PlayerMinLeadTime: 0.1,
+    AutoPilotLeadTime: 0.5,
+    AutoPilotMinLeadTime: 0.1,
     AutoPilotStoppingDistance: 16,
     AutoPilotAlignmentVelocityFactor: 0.05,
 

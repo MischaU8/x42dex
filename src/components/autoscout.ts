@@ -1,5 +1,4 @@
 import * as ex from 'excalibur';
-import { PausableMotionSystem } from '../systems/PausableMotionSystem';
 import { Ship, ShipEvents, ShipStoppedEvent } from '../actors/ship';
 import { MyLevel } from '../scenes/level';
 import { ShipTarget } from './autopilot';
@@ -18,7 +17,6 @@ export class AutoscoutComponent extends ex.Component {
     enabled: boolean = true;
 
     target: ex.Actor | null = null;
-    motionSystem!: PausableMotionSystem;
 
     machine = ex.StateMachine.create({
         start: 'IDLE',
@@ -44,17 +42,13 @@ export class AutoscoutComponent extends ex.Component {
     }
 
     onAdd(owner: ex.Actor): void {
-        owner.on('initialize', (evt: ex.InitializeEvent) => {
-            this.motionSystem = evt.engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
-        })
-
         this.owner.events.on(ShipEvents.Stopped, (evt: ShipStoppedEvent) => {
             this.onStoppedAt(evt.where);
         });
 
         const timer = new ex.Timer({
             action: () => {
-                if (!this.enabled || this.motionSystem.paused) {
+                if (!this.enabled || this.owner.motionSystem.paused) {
                     return;
                 }
                 this.machine.update(timer.interval);

@@ -2,13 +2,14 @@ import * as ex from "excalibur";
 import { ColorizeGLSL } from "../materials";
 import { Config } from "../config";
 import * as gev from "../gameevents";
+import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 
 
 export class StaticSpaceObject extends ex.Actor {
   public events = new ex.EventEmitter<ex.ActorEvents & gev.MyActorEvents>();
 
   image: ex.ImageSource;
-
+  motionSystem!: PausableMotionSystem;
   constructor(name: string, image: ex.ImageSource, color: ex.Color, pos: ex.Vector) {
     super({
       name,
@@ -22,6 +23,8 @@ export class StaticSpaceObject extends ex.Actor {
   }
 
   override onInitialize(engine: ex.Engine) {
+    this.motionSystem = engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
+
     this.graphics.add(this.image.toSprite({destSize: {
       width: Config.StaticSpaceObjectWidth,
       height: Config.StaticSpaceObjectHeight,

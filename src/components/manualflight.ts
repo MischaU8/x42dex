@@ -1,23 +1,18 @@
 import * as ex from 'excalibur'
-import { PausableMotionSystem } from '../systems/PausableMotionSystem'
+
 import { Ship } from '../actors/ship';
 
 export class ManualFlightComponent extends ex.Component {
   declare owner: Ship
 
-  motionSystem!: PausableMotionSystem;
-
   onAdd(owner: ex.Actor): void {
-    owner.on('initialize', (evt: ex.InitializeEvent) => {
-      this.motionSystem = evt.engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
-    })
     owner.on('postupdate', (evt: ex.PostUpdateEvent) => {
       this.onPostUpdate(evt.engine, evt.elapsed)
     })
   }
 
   onPostUpdate(engine: ex.Engine, _elapsed: number): void {
-    if (this.motionSystem.paused) {
+    if (this.owner.motionSystem.paused) {
       return;
     }
     this.keyboardInput(engine);

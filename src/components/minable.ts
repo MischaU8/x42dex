@@ -1,16 +1,13 @@
 import * as ex from 'excalibur'
 import { MinableWares } from '../data/wares'
-import { PausableMotionSystem } from '../systems/PausableMotionSystem'
-
+import { StaticSpaceObject } from '../actors/StaticSpaceObject'
 export class MinableComponent extends ex.Component {
-  declare owner: ex.Actor
+  declare owner: StaticSpaceObject
 
   type: MinableWares
   amount: number
   maxAmount: number
   respawnRate: number
-
-  motionSystem!: PausableMotionSystem;
 
   constructor(type: MinableWares, amount: number, maxAmount: number, respawnRate: number) {
     super()
@@ -21,16 +18,13 @@ export class MinableComponent extends ex.Component {
   }
 
   onAdd(owner: ex.Actor): void {
-    owner.on('initialize', (evt: ex.InitializeEvent) => {
-      this.motionSystem = evt.engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
-    })
     owner.on('postupdate', (evt: ex.PostUpdateEvent) => {
       this.onPostUpdate(evt.engine, evt.elapsed)
     })
   }
 
   onPostUpdate(_engine: ex.Engine, elapsed: number): void {
-    if (this.motionSystem.paused) {
+    if (this.owner.motionSystem.paused) {
       return;
     }
     if (this.amount < this.maxAmount) {

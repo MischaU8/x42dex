@@ -1,5 +1,4 @@
 import * as ex from 'excalibur';
-import { PausableMotionSystem } from '../systems/PausableMotionSystem';
 import { Config } from '../config';
 import { Ship } from '../actors/ship';
 import { MovementComponent } from './movement';
@@ -11,19 +10,17 @@ export class AutopilotComponent extends ex.Component {
 
     enabled: boolean = false;
     target: ex.Vector | ex.Actor = ex.Vector.Zero;
-    motionSystem!: PausableMotionSystem;
     movement!: MovementComponent;
 
     onAdd(owner: ex.Actor): void {
         owner.on('initialize', (evt: ex.InitializeEvent) => {
-            this.motionSystem = evt.engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
             this.movement = owner.get(MovementComponent) as MovementComponent;
         })
         owner.on('postupdate', this.update.bind(this));
     }
 
     update() {
-        if (this.getTargetPos().equals(ex.Vector.Zero) || !this.enabled || this.motionSystem.paused) {
+        if (this.getTargetPos().equals(ex.Vector.Zero) || !this.enabled || this.owner.motionSystem.paused) {
             return;
         }
 
@@ -32,8 +29,8 @@ export class AutopilotComponent extends ex.Component {
         const currentSpeed = this.owner.vel.magnitude;
 
         const leadTime = currentSpeed > 0 ?
-            (distanceToTarget / currentSpeed) * Config.PlayerLeadTime :
-            Config.PlayerMinLeadTime;
+            (distanceToTarget / currentSpeed) * Config.AutoPilotLeadTime :
+            Config.AutoPilotMinLeadTime;
 
         const leadPos = this.owner.pos.add(this.owner.vel.scale(leadTime));
         const leadDelta = this.getTargetPos().sub(leadPos);

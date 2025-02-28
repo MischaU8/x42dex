@@ -38,6 +38,7 @@ export interface ShipConfig {
             initialRangeMultiplier?: number;
         };
     };
+    index?: number;
 }
 
 const DefaultAutominerConfig = {

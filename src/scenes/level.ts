@@ -20,10 +20,9 @@ import { MinableComponent } from "../components/minable";
 import { StationComponent } from "../components/station";
 import { AutopilotComponent } from "../components/autopilot";
 import { CargoComponent } from "../components/cargo";
-import { AutominerComponent } from "../components/autominer";
 import { WalletComponent } from "../components/wallet";
 import { DefaultShipConfigs } from "../data/ships";
-import { AutoscoutComponent } from "../components/autoscout";
+import { ShipFactory } from "../factories/ShipFactory";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
@@ -48,7 +47,10 @@ export class MyLevel extends ex.Scene {
     });
     actorDetails = new ActorDetailsPanel();
 
+    private shipFactory!: ShipFactory;
+
     override onInitialize(engine: ex.Engine): void {
+        this.shipFactory = new ShipFactory(this, this.random, this.map);
         // replace the default motion system with a pausable one
         this.world.remove(this.world.get(ex.MotionSystem));
         this.world.add(this.pausableMotionSystem);
@@ -146,58 +148,20 @@ export class MyLevel extends ex.Scene {
     private spawnShips() {
         for (const config of DefaultShipConfigs) {
             for (let i = 0; i < config.count; i++) {
-                const shipImage = this.random.pickOne(config.possibleImages);
-                const shipColor = this.random.pickOne(config.possibleColors);
                 const pos = this.getRandomPosWithMinDistance();
-
                 if (pos.equals(ex.Vector.Zero)) {
                     console.log(`Failed to get a valid position for ${config.name} ship ${i}`);
                     break;
                 }
 
-                const ship = new Ship(`${config.name} ${i}`, shipImage, shipColor, this.map);
+                const ship = this.shipFactory.createShip({
+                    ...config,
+                    index: i
+                });
                 ship.pos = pos;
                 ship.rotation = this.random.floating(0, Math.PI * 2);
-
-                // Add components based on configuration
-                if (config.components.cargo) {
-                    ship.addComponent(new CargoComponent(config.components.cargo.maxVolume, config.components.cargo.resourceFilter));
-                }
-
-                if (config.components.wallet) {
-                    ship.addComponent(new WalletComponent(config.components.wallet.initialBalance));
-                }
-
-                if (config.components.autopilot) {
-                    ship.addComponent(new AutopilotComponent());
-                }
-
-                if (config.components.autominer) {
-                    const am = config.components.autominer;
-                    ship.addComponent(new AutominerComponent(this,
-                        this.random.integer(am.minMineAmount!, am.maxMineAmount!),
-                        this.random.integer(am.minUnloadAmount!, am.maxUnloadAmount!),
-                        this.random.floating(am.minUnloadThreshold!, am.maxUnloadThreshold!),
-                        this.random.integer(am.minTopNAstroids!, am.maxTopNAstroids!),
-                        this.random.integer(am.minTopNStations!, am.maxTopNStations!),
-                        am.initialRangeMultiplier!
-                    ));
-                }
-
-                if (config.components.autoscout) {
-                    ship.addComponent(new AutoscoutComponent(this, config.components.autoscout.topNObjects, config.components.autoscout.rememberNObjects, config.components.autoscout.initialRangeMultiplier));
-                }
-
+                ship.vel = ex.vec(this.random.integer(-100, 100), this.random.integer(-100, 100));
                 this.add(ship);
-
-                // Add event listeners
-                ship.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
-                    this.onSelectShip(evt.target as Ship);
-                });
-
-                ship.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
-                    this.onTargetShip(evt.target as Ship);
-                });
             }
         }
     }
@@ -260,12 +224,12 @@ export class MyLevel extends ex.Scene {
         }
     }
 
-    private deselectAny() {
+    deselectAny() {
         this.map.deselectHexagon();
         this.actorDetails.resetTarget();
     }
 
-    private onSelectAstroid(astroid: StaticSpaceObject) {
+    onSelectAstroid(astroid: StaticSpaceObject) {
         this.deselectAny();
         if (this.cursor.target === astroid) {
             this.cursor.target = null;
@@ -279,7 +243,7 @@ export class MyLevel extends ex.Scene {
         }
     }
 
-    private onSelectStation(station: StaticSpaceObject) {
+    onSelectStation(station: StaticSpaceObject) {
         this.deselectAny();
         if (this.cursor.target === station) {
             this.cursor.target = null;
@@ -293,7 +257,7 @@ export class MyLevel extends ex.Scene {
         }
     }
 
-    private onSelectShip(ship: Ship) {
+    onSelectShip(ship: Ship) {
         this.deselectAny();
         if (this.cursor.target === ship) {
             this.cursor.target = null;
@@ -307,17 +271,17 @@ export class MyLevel extends ex.Scene {
         }
     }
 
-    private onTargetShip(ship: Ship) {
+    onTargetShip(ship: Ship) {
         console.log('Targeted ship', ship.name);
         this.player.orderFollow(ship);
     }
 
-    private onTargetAstroid(astroid: StaticSpaceObject) {
+    onTargetAstroid(astroid: StaticSpaceObject) {
         console.log('Targeted astroid', astroid.name);
         this.player.orderMoveTo(astroid);
     }
 
-    private onTargetStation(station: StaticSpaceObject) {
+    onTargetStation(station: StaticSpaceObject) {
         console.log('Targeted station', station.name);
         this.player.orderMoveTo(station);
     }

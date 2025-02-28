@@ -42,18 +42,6 @@ export const Config = {
     StationMinInitialBalance: 100_000,
     StationMaxInitialBalance: 1_000_000,
 
-    // autominer
-    AutoMinerMinMineAmount: 10,
-    AutoMinerMaxMineAmount: 50,
-    AutoMinerMinUnloadAmount: 10,
-    AutoMinerMaxUnloadAmount: 50,
-    AutoMinerMinUnloadThreshold: 0.5,
-    AutoMinerMaxUnloadThreshold: 0.9,
-    AutoMinerMinTopNAstroids: 3,
-    AutoMinerMaxTopNAstroids: 5,
-    AutoMinerMinTopNStations: 1,
-    AutoMinerMaxTopNStations: 3,
-
     // autopilot
     PlayerLeadTime: 0.5,
     PlayerMinLeadTime: 0.1,

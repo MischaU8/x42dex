@@ -1,9 +1,5 @@
 import * as ex from "excalibur";
 
-import * as gev from "../gameevents";
-
-import { AstroidTypes, AstroidTypeKey } from "../data/astroids";
-import { MinableWares } from "../data/wares";
 import { Config } from "../config";
 import { Resources } from "../resources";
 
@@ -15,13 +11,11 @@ import { Ship } from "../actors/ship";
 import { StaticSpaceObject } from "../actors/StaticSpaceObject";
 import { Cursor } from "../actors/cursor";
 import { PausableMotionSystem } from "../systems/PausableMotionSystem";
-import { MinableComponent } from "../components/minable";
-import { StationComponent } from "../components/station";
-import { CargoComponent } from "../components/cargo";
-import { WalletComponent } from "../components/wallet";
 import { DefaultShipConfigs } from "../data/ships";
 import { ShipFactory } from "../factories/ShipFactory";
 import { ManualFlightComponent } from "../components/manualflight";
+import { StationFactory } from "../factories/StationFactory";
+import { AstroidFactory } from "../factories/AstroidFactory";
 
 export class MyLevel extends ex.Scene {
     random = new ex.Random(Config.Seed);
@@ -48,9 +42,13 @@ export class MyLevel extends ex.Scene {
     actorDetails = new ActorDetailsPanel();
 
     private shipFactory!: ShipFactory;
+    private stationFactory!: StationFactory;
+    private astroidFactory!: AstroidFactory;
 
     override onInitialize(engine: ex.Engine): void {
         this.shipFactory = new ShipFactory(this, this.random, this.map);
+        this.stationFactory = new StationFactory(this, this.random);
+        this.astroidFactory = new AstroidFactory(this, this.random);
         // replace the default motion system with a pausable one
         this.world.remove(this.world.get(ex.MotionSystem));
         this.world.add(this.pausableMotionSystem);
@@ -61,7 +59,6 @@ export class MyLevel extends ex.Scene {
 
         this.add(this.map);
         this.add(this.statusLabel);
-        // this.actorDetails.pos.setTo(10, engine.screen.drawHeight-172);
         this.add(this.actorDetails);
         this.spawnStations();
         this.spawnAstroids();
@@ -164,26 +161,14 @@ export class MyLevel extends ex.Scene {
                 break;
             }
 
-            // TODO weight the astroid type by frequency
-            const astroidTypeKey = this.random.pickOne(Object.keys(AstroidTypes));
-            const astroidType = AstroidTypes[astroidTypeKey as AstroidTypeKey];
-            const astroid = new StaticSpaceObject(`${astroidType.name} Astroid #${i}`, astroidType.image, astroidType.color, pos);
-            astroid.addComponent(new MinableComponent(
-                astroidTypeKey as MinableWares,
-                this.random.integer(astroidType.minAmount, astroidType.maxAmount),
-                astroidType.maxAmount,
-                this.random.floating(astroidType.minRespawnRate, astroidType.maxRespawnRate),
-            ));
+            const astroid = this.astroidFactory.createAstroid({
+                name: 'Astroid',
+                index: i
+            });
+            astroid.pos = pos;
+
             this.add(astroid);
             this.staticObjects.push(astroid);
-
-            astroid.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
-                this.onSelectAstroid(evt.target as StaticSpaceObject);
-            });
-
-            astroid.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
-                this.onTargetAstroid(evt.target as StaticSpaceObject);
-            });
         }
     }
 
@@ -195,22 +180,14 @@ export class MyLevel extends ex.Scene {
                 break;
             }
 
-            const stationImage = this.random.pickOne([Resources.StationA, Resources.StationB]);
-            const stationColor = this.random.pickOne([ex.Color.ExcaliburBlue, ex.Color.Teal]);
-            const station = new StaticSpaceObject(`Station ${i}`, stationImage, stationColor, pos);
-            station.addComponent(new StationComponent(this.random));
-            station.addComponent(new CargoComponent(Config.StationMaxVolume));
-            station.addComponent(new WalletComponent(this.random.integer(Config.StationMinInitialBalance, Config.StationMaxInitialBalance)));
+            const station = this.stationFactory.createStation({
+                name: 'Station',
+                index: i
+            });
+            station.pos = pos;
+
             this.add(station);
             this.staticObjects.push(station);
-
-            station.events.on(gev.MyActorEvents.Selected, (evt: gev.ActorSelectedEvent) => {
-                this.onSelectStation(evt.target as StaticSpaceObject);
-            });
-
-            station.events.on(gev.MyActorEvents.Targeted, (evt: gev.ActorTargetedEvent) => {
-                this.onTargetStation(evt.target as StaticSpaceObject);
-            });
         }
     }
 
@@ -285,17 +262,6 @@ export class MyLevel extends ex.Scene {
                 }
             }, duration);
         }
-    }
-
-    public getNearbyStaticObjectWithComponent(source: ex.Actor, component: ex.ComponentCtor<ex.Component>, topN: number = 1, maxRange: number = 128, exclude: ex.Actor[] = []): StaticSpaceObject {
-        const objects = this.staticObjects.filter(obj => obj.has(component) && !exclude.includes(obj) && source.pos.distance(obj.pos) <= maxRange);
-        const sortedObjects = objects.sort((a, b) => source.pos.distance(a.pos) - source.pos.distance(b.pos));
-        return this.random.pickOne(sortedObjects.slice(0, topN));
-    }
-
-    public getRandomStaticObjectWithComponent(component: ex.ComponentCtor<ex.Component>): StaticSpaceObject {
-        const objects = this.staticObjects.filter(obj => obj.has(component));
-        return this.random.pickOne(objects);
     }
 
     private getRandomPosWithMinDistance(minDistance: number = 64, maxAttempts: number = 25): ex.Vector {

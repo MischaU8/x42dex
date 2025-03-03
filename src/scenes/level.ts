@@ -174,7 +174,7 @@ export class MyLevel extends ex.Scene {
 
     private spawnStations() {
         for (let i = 0; i < Config.NumStations; i++) {
-            const pos = this.getRandomPosWithMinDistance(64 * Config.WorldSize);
+            const pos = this.getRandomPosWithMinDistance(Config.MinStationDistance);
             if (pos.equals(ex.Vector.Zero)) {
                 console.log('Failed to get a valid position for station', i);
                 break;

@@ -7,8 +7,8 @@ export const Config = {
     Seed: 41,
 
     WorldSize: worldSize,
-    MapCols: Math.floor(20 * worldSize),
-    MapRows: Math.floor(11 * worldSize),
+    MapCols: Math.floor(60),
+    MapRows: Math.floor(33),
     MapSize: 48,
     MapPadding: 1,
 
@@ -25,7 +25,6 @@ export const Config = {
 
     NumStations: Math.floor(5 * worldSize * worldSize),
     NumAstroids: Math.floor(25 * worldSize * worldSize),
-    NumShips: Math.floor(15 * worldSize * worldSize),
 
     StaticSpaceObjectWidth: 32,
     StaticSpaceObjectHeight: 32,
@@ -33,6 +32,7 @@ export const Config = {
     ShipHeight: 16,
 
     // station
+    MinStationDistance: 64 * worldSize,
     StationMaxVolume: 100_000,
     StationMinInitialBalance: 100_000,
     StationMaxInitialBalance: 1_000_000,

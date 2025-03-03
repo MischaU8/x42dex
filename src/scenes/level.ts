@@ -12,6 +12,7 @@ import { StaticSpaceObject } from "../actors/StaticSpaceObject";
 import { Cursor } from "../actors/cursor";
 import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 import { DefaultShipConfigs } from "../data/ships";
+import { DefaultStationConfigs } from "../data/stations";
 import { ShipFactory } from "../factories/ShipFactory";
 import { ManualFlightComponent } from "../components/manualflight";
 import { StationFactory } from "../factories/StationFactory";
@@ -173,21 +174,23 @@ export class MyLevel extends ex.Scene {
     }
 
     private spawnStations() {
-        for (let i = 0; i < Config.NumStations; i++) {
-            const pos = this.getRandomPosWithMinDistance(Config.MinStationDistance);
-            if (pos.equals(ex.Vector.Zero)) {
-                console.log('Failed to get a valid position for station', i);
-                break;
+        for (const config of DefaultStationConfigs) {
+            for (let i = 0; i < config.count; i++) {
+                const pos = this.getRandomPosWithMinDistance(Config.MinStationDistance);
+                if (pos.equals(ex.Vector.Zero)) {
+                    console.log(`Failed to get a valid position for ${config.name} ${i}`);
+                    break;
+                }
+
+                const station = this.stationFactory.createStation({
+                    ...config,
+                    index: i
+                });
+                station.pos = pos;
+
+                this.add(station);
+                this.staticObjects.push(station);
             }
-
-            const station = this.stationFactory.createStation({
-                name: 'Station',
-                index: i
-            });
-            station.pos = pos;
-
-            this.add(station);
-            this.staticObjects.push(station);
         }
     }
 

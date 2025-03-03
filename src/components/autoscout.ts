@@ -4,6 +4,7 @@ import { MyLevel } from '../scenes/level';
 import { ShipTarget } from './autopilot';
 
 import { StaticSpaceObject } from '../actors/StaticSpaceObject';
+import { StationComponent } from './station';
 
 export class AutoscoutComponent extends ex.Component {
     declare owner: Ship;
@@ -12,7 +13,7 @@ export class AutoscoutComponent extends ex.Component {
     topNObjects: number = 1;
     rememberNObjects: number = 1;
     initialRangeMultiplier: number = 1;
-    rangeMultiplier: number = 1;
+    rangeMultiplier: number = 0;
     excludeTargets: ex.Actor[] = [];
     enabled: boolean = true;
 
@@ -28,6 +29,7 @@ export class AutoscoutComponent extends ex.Component {
           FIND_OBJECT: {
             onEnter: this.onFindObjectEnter.bind(this),
             onUpdate: this.onFindObjectUpdate.bind(this),
+            onExit: this.resetRangeMultiplier.bind(this),
             transitions: ['IDLE']
           },
         }
@@ -64,7 +66,7 @@ export class AutoscoutComponent extends ex.Component {
     }
 
     getDetails(): string {
-        return `${this.machine.currentState.name} (${this.rangeMultiplier}x)`;
+        return `${this.machine.currentState.name} ${this.rangeMultiplier > 0 ? `(range ${this.rangeMultiplier}x)` : ''}`;
     }
 
     onIdleUpdate(_data: unknown, elapsed: number) {
@@ -83,6 +85,10 @@ export class AutoscoutComponent extends ex.Component {
         this.target = null;
     }
 
+    resetRangeMultiplier() {
+        this.rangeMultiplier = 0;
+    }
+
     onFindObjectUpdate(_data: unknown, elapsed: number) {
         if (this.target) {
             return;
@@ -99,7 +105,7 @@ export class AutoscoutComponent extends ex.Component {
 
     getNearbyObjects(): StaticSpaceObject[] {
         const maxRange = this.rangeMultiplier * this.owner.sensorRadius;
-        return this.level.staticObjects.filter(obj => !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange);
+        return this.level.staticObjects.filter(obj => obj.has(StationComponent) &&!this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange);
     }
 
     getNearbyStaticObject(candidates: StaticSpaceObject[], topN: number = 1): StaticSpaceObject {

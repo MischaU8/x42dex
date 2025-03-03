@@ -21,7 +21,7 @@ export class AutominerComponent extends ex.Component {
     topNStations: number = 2;
 
     initialRangeMultiplier: number = 1;
-    rangeMultiplier: number = 1;
+    rangeMultiplier: number = 0;
     excludeTargets: ex.Actor[] = [];
 
     enabled: boolean = true;
@@ -37,6 +37,7 @@ export class AutominerComponent extends ex.Component {
           FIND_ASTROID: {
             onEnter: this.onFindAstroidEnter.bind(this),
             onUpdate: this.onFindAstroidUpdate.bind(this),
+            onExit: this.resetRangeMultiplier.bind(this),
             transitions: ['MINE_ASTROID', 'IDLE']
           },
           MINE_ASTROID: {
@@ -46,6 +47,7 @@ export class AutominerComponent extends ex.Component {
           FIND_STATION: {
             onEnter: this.onFindStationEnter.bind(this),
             onUpdate: this.onFindStationUpdate.bind(this),
+            onExit: this.resetRangeMultiplier.bind(this),
             transitions: ['DELIVER_CARGO', 'IDLE']
           },
           DELIVER_CARGO: {
@@ -90,7 +92,7 @@ export class AutominerComponent extends ex.Component {
     }
 
     getDetails(): string {
-        return `${this.machine.currentState.name} (${this.rangeMultiplier}x)`;
+        return `${this.machine.currentState.name} ${this.rangeMultiplier > 0 ? `(range ${this.rangeMultiplier}x)` : ''}`;
     }
 
     onIdleUpdate(_data: unknown, elapsed: number) {
@@ -111,6 +113,10 @@ export class AutominerComponent extends ex.Component {
             this.excludeTargets.push(this.target);
         }
         this.target = null;
+    }
+
+    resetRangeMultiplier() {
+        this.rangeMultiplier = 0;
     }
 
     onFindAstroidUpdate(_data: unknown, elapsed: number) {

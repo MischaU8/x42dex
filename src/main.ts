@@ -1,8 +1,9 @@
 import * as ex from "excalibur";
+import Hammer from 'hammerjs';
+
 import { loader } from "./resources";
 import { MyLevel } from "./scenes/level";
 import { Config } from "./config";
-
 // Goal is to keep main.ts small and just enough to configure the engine
 
 const game = new ex.Engine({
@@ -45,6 +46,13 @@ game.input.pointers.primary.on('wheel', (wheelEvent) => {
       game.currentScene.camera.zoom /= Config.ZoomWheelFactor;
     }
     game.currentScene.camera.zoom = ex.clamp(game.currentScene.camera.zoom, Config.MinZoom, Config.MaxZoom);
+});
+
+const hammer = new Hammer(document.getElementById('game')!);
+hammer.get('pinch').set({ enable: true });
+hammer.on('pinch', function(ev) {
+  game.currentScene.camera.zoom = ev.scale;
+  game.currentScene.camera.zoom = ex.clamp(game.currentScene.camera.zoom, Config.MinZoom, Config.MaxZoom);
 });
 
 game.start('start', { // name of the start scene 'start'

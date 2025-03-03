@@ -51,8 +51,7 @@ game.input.pointers.primary.on('wheel', (wheelEvent) => {
 const hammer = new Hammer(document.getElementById('game')!);
 hammer.get('pinch').set({ enable: true });
 hammer.on('pinch', function(ev) {
-  game.currentScene.camera.zoom = ev.scale;
-  game.currentScene.camera.zoom = ex.clamp(game.currentScene.camera.zoom, Config.MinZoom, Config.MaxZoom);
+  game.currentScene.camera.zoom = ex.clamp(ev.scale, Config.MinZoom, Config.MaxZoom);
 });
 
 game.start('start', { // name of the start scene 'start'

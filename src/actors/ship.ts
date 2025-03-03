@@ -95,8 +95,8 @@ export class Ship extends ex.Actor {
    vel ${this.vel.magnitude.toFixed(0).padStart(3, "0")}m/s
    acc ${this.acc.magnitude.toFixed(0).padStart(3, "0")}m/s²
 
-wallet ${this.get(WalletComponent)?.getDetails()}
- cargo ${this.get(CargoComponent)?.getDetails()}
+wallet ${this.get(WalletComponent)?.getDetails() || '-'}
+ cargo ${this.get(CargoComponent)?.getDetails() || '-'}
 
 autominer ${this.get(AutominerComponent)?.getDetails() || 'off'}
 autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}

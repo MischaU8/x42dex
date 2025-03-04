@@ -20,7 +20,7 @@ export class AutominerComponent extends ex.Component {
     topNAstroids: number = 5;
     topNStations: number = 2;
 
-    initialRangeMultiplier: number = 1;
+    initialRangeMultiplier: number = 2;
     rangeMultiplier: number = 0;
     excludeTargets: ex.Actor[] = [];
 
@@ -126,7 +126,7 @@ export class AutominerComponent extends ex.Component {
         const candidates = this.getNearbyAstroids();
         if (candidates.length === 0) {
             // console.log(this.owner.name, 'no useful astroids in range, increasing range');
-            this.rangeMultiplier += 1;
+            this.rangeMultiplier *= 2;
             return;
         }
         this.target = this.getNearbyStaticObject(candidates, this.topNAstroids);
@@ -156,7 +156,7 @@ export class AutominerComponent extends ex.Component {
         const candidates = this.getNearbyStations();
         if (candidates.length === 0) {
             // console.log(this.owner.name, 'no useful stations in range, increasing range');
-            this.rangeMultiplier += 1;
+            this.rangeMultiplier *= 2;
             return;
         }
         this.target = this.getNearbyStaticObject(candidates, this.topNStations);

@@ -11,7 +11,7 @@ export class AutoscoutComponent extends ex.Component {
 
     topNObjects: number = 1;
     rememberNObjects: number = 1;
-    initialRangeMultiplier: number = 1;
+    initialRangeMultiplier: number = 2;
     rangeMultiplier: number = 0;
     excludeTargets: ex.Actor[] = [];
     enabled: boolean = true;
@@ -95,7 +95,7 @@ export class AutoscoutComponent extends ex.Component {
         const candidates = this.getNearbyObjects();
         if (candidates.length === 0) {
             // console.log(this.owner.name, 'no useful astroids in range, increasing range');
-            this.rangeMultiplier += 1;
+            this.rangeMultiplier *= 2;
             return;
         }
         this.target = this.getNearbyStaticObject(candidates, this.topNObjects);

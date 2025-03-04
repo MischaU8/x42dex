@@ -11,6 +11,10 @@ export enum MinableWares {
     methane = 'methane'
 }
 
+export enum WaterWares {
+    water = 'water',
+}
+
 export enum RefinedWares {
     antimattercells = 'antimattercells',
     graphene = 'graphene',
@@ -42,7 +46,7 @@ export enum HighTechWares {
     scanningarrays = 'scanningarrays',
 }
 
-export type WaresType = EnergyWares | MinableWares | RefinedWares | ShipTechWares | HighTechWares
+export type WaresType = EnergyWares | MinableWares | WaterWares | RefinedWares | ShipTechWares | HighTechWares
 
 export type WaresData = {
     name: string;
@@ -224,7 +228,7 @@ export const Wares = {
     [RefinedWares.siliconwafers]: {
         name: 'Silicon Wafers',
         minPrice: 180,
-        avgPrice: 229,
+        avgPrice: 299,
         maxPrice: 419,
         volume: 18,
     },
@@ -248,6 +252,13 @@ export const Wares = {
         avgPrice: 273,
         maxPrice: 383,
         volume: 20,
+    },
+    [WaterWares.water]: {
+        name: 'Water',
+        minPrice: 32,
+        avgPrice: 53,
+        maxPrice: 74,
+        volume: 6,
     },
     [ShipTechWares.weaponcomponents]: {
         name: 'Weapon Components',

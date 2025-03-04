@@ -137,10 +137,7 @@ export class MyLevel extends ex.Scene {
                     break;
                 }
 
-                const ship = this.shipFactory.createShip({
-                    ...config,
-                    index: i
-                });
+                const ship = this.shipFactory.createShip(config);
 
                 if (config.name === 'Player') {
                     this.setupPlayer(engine, ship);

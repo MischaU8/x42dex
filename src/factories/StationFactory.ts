@@ -7,14 +7,7 @@ import { CargoComponent } from "../components/cargo";
 import { WalletComponent } from "../components/wallet";
 import { MyLevel } from "../scenes/level";
 import { Resources } from "../resources";
-import { Config } from "../config";
-
-export interface StationConfig {
-    name: string;
-    index: number;
-    possibleImages?: ex.ImageSource[];
-    possibleColors?: ex.Color[];
-}
+import { StationConfig } from "../data/stations";
 
 export class StationFactory {
     constructor(
@@ -33,18 +26,22 @@ export class StationFactory {
             ex.Vector.Zero
         );
 
-        this.addComponents(station);
+        this.addComponents(station, config);
         this.bindEvents(station);
 
         return station;
     }
 
-    private addComponents(station: StaticSpaceObject) {
+    private addComponents(station: StaticSpaceObject, config: StationConfig) {
+        const cargo = config.components?.cargo;
+        if (cargo) {
+            station.addComponent(new CargoComponent(cargo.maxVolume, cargo.resourceFilter));
+        }
+        const wallet = config.components?.wallet;
+        if (wallet) {
+            station.addComponent(new WalletComponent(wallet.initialBalance));
+        }
         station.addComponent(new StationComponent(this.random));
-        station.addComponent(new CargoComponent(Config.StationMaxVolume));
-        station.addComponent(new WalletComponent(
-            this.random.integer(Config.StationMinInitialBalance, Config.StationMaxInitialBalance)
-        ));
     }
 
     private bindEvents(station: StaticSpaceObject) {

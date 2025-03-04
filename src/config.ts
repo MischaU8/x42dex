@@ -8,7 +8,7 @@ export const Config = {
 
     WorldSize: worldSize,
     MapCols: Math.floor(60),
-    MapRows: Math.floor(33),
+    MapRows: Math.floor(41),
     MapSize: 48,
     MapPadding: 1,
 

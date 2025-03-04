@@ -165,7 +165,8 @@ export class AutominerComponent extends ex.Component {
 
     getNearbyStations(): StaticSpaceObject[] {
         const maxRange = this.rangeMultiplier * this.owner.sensorRadius;
-        return this.level.staticObjects.filter(obj => obj.has(StationComponent) && !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange && obj.get(WalletComponent)?.balance >= 1000);
+        const shipCargo = this.owner.get(CargoComponent);
+        return this.level.staticObjects.filter(obj => obj.has(StationComponent) && !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange && obj.get(WalletComponent)?.balance >= 1000 && Object.keys(shipCargo.items).some(item => obj.get(StationComponent)?.itemPrices[item as WaresType] > 0));
     }
 
     getNearbyStaticObject(candidates: StaticSpaceObject[], topN: number = 1): StaticSpaceObject {

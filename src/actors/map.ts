@@ -51,35 +51,6 @@ export class Map extends ex.Actor {
     }
 
     override onInitialize(engine: ex.Engine): void {
-
-        if (false) {
-            const grid = new ex.Actor({
-                pos: ex.vec(-this.hexWidth/2, -this.hexHeight*0.75),
-                width: this.gridWidth,
-                height: this.gridHeight,
-                color: ex.Color.Transparent,
-                anchor: ex.vec(0, 0),
-                z: -10
-            });
-            this.addChild(grid);
-
-            grid.on('pointerdown', evt => {
-                console.log('map pointerdown', evt);
-                if (evt instanceof ex.PointerEvent && evt.button === ex.PointerButton.Left) {
-                    evt.cancel();
-                    this.onClick(evt.worldPos);
-                }
-            });
-        }
-
-        if (false) {
-            for (let q = 0; q < this.cols; q++) {
-                for (let r = 0; r < this.rows; r++) {
-                    this.spawnTile(q, r);
-                }
-            }
-        }
-
         this.selectedHexagon = new Hexagon('selected_hex', ex.vec(0, 0), (this.size-this.padding)/2, {
             color: ex.Color.Transparent,
             strokeColor: ex.Color.Yellow,
@@ -88,7 +59,6 @@ export class Map extends ex.Actor {
             padding: 2,
             quality: 2
         });
-        // this.selectedHexagon.z = 0;
         this.selectedHexagon.graphics.isVisible = false;
         this.addChild(this.selectedHexagon);
     }

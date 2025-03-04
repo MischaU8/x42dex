@@ -27,7 +27,7 @@ export default defineConfig({
     },
     build: {
         assetsInlineLimit: 0, // excalibur cannot handle inlined xml in prod mode
-        chunkSizeWarningLimit: 600, // just above 500kb
+        chunkSizeWarningLimit: 650, // just above 500kb
         sourcemap: true,
         // Vite uses rollup currently for prod builds so a separate config is needed
         // to keep vite from bundling ESM together with commonjs

@@ -97,6 +97,7 @@ export class MyLevel extends ex.Scene {
 
         engine.input.keyboard.on("press", (evt: ex.KeyEvent) => {
             if (evt.key === ex.Keys.Space) {
+                // toggle pause
                 if (this.pausableMotionSystem.paused) {
                     this.setStatusLabel('GAME RESUMED');
                     this.pausableMotionSystem.paused = false;
@@ -105,9 +106,11 @@ export class MyLevel extends ex.Scene {
                     this.pausableMotionSystem.paused = true;
                 }
             } else if (evt.key === ex.Keys.Escape) {
+                // deselect any target
                 this.deselectAny();
                 this.cursor.target = null;
             } else if (evt.key === ex.Keys.F) {
+                // toggle following the selected ship
                 if (this.following) {
                     this.engine.currentScene.camera.clearAllStrategies();
                     this.setStatusLabel('Unfollowing', 1000);
@@ -117,6 +120,10 @@ export class MyLevel extends ex.Scene {
                     this.setStatusLabel(`Following ${this.cursor.target.name}`, 1000);
                     this.following = true;
                 }
+            } else if (evt.key === ex.Keys.C) {
+                // select and focus on player ship
+                this.engine.currentScene.camera.pos = this.player.pos;
+                this.onSelectShip(this.player);
             }
         });
     }

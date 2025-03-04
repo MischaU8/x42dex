@@ -4,7 +4,6 @@ import { MyLevel } from '../scenes/level';
 import { ShipTarget } from './autopilot';
 
 import { StaticSpaceObject } from '../actors/StaticSpaceObject';
-import { StationComponent } from './station';
 
 export class AutoscoutComponent extends ex.Component {
     declare owner: Ship;
@@ -105,7 +104,7 @@ export class AutoscoutComponent extends ex.Component {
 
     getNearbyObjects(): StaticSpaceObject[] {
         const maxRange = this.rangeMultiplier * this.owner.sensorRadius;
-        return this.level.staticObjects.filter(obj => obj.has(StationComponent) &&!this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange);
+        return this.level.staticObjects.filter(obj => !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange);
     }
 
     getNearbyStaticObject(candidates: StaticSpaceObject[], topN: number = 1): StaticSpaceObject {

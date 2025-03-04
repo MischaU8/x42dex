@@ -23,7 +23,6 @@ export const Config = {
     MaxZoom: 2.0,
     MinShipVisibilityZoom: 0.5,
 
-    NumStations: Math.floor(5 * worldSize * worldSize),
     NumAstroids: Math.floor(25 * worldSize * worldSize),
 
     StaticSpaceObjectWidth: 32,
@@ -33,9 +32,6 @@ export const Config = {
 
     // station
     MinStationDistance: 64 * worldSize,
-    StationMaxVolume: 100_000,
-    StationMinInitialBalance: 100_000,
-    StationMaxInitialBalance: 1_000_000,
 
     // autopilot
     AutoPilotLeadTime: 0.5,

@@ -146,7 +146,7 @@ export const DefaultStationConfigs: StationConfig[] = [
         type: 'production',
         count: 5,
         possibleImages: [Resources.StationB],
-        possibleColors: [ex.Color.Green],
+        possibleColors: [ex.Color.Yellow],
         components: {
             cargo: {
                 maxVolume: 50_000,
@@ -157,6 +157,25 @@ export const DefaultStationConfigs: StationConfig[] = [
             },
             wallet: {
                 initialBalance: 0
+            }
+        }
+    },
+    {
+        name: 'Superfluid Coolant Factory',
+        type: 'production',
+        count: 3,
+        possibleImages: [Resources.StationC],
+        possibleColors: [ex.Color.Blue],
+        components: {
+            cargo: {
+                maxVolume: 50_000,
+                resourceFilter: [EnergyWares.energycells, MinableWares.helium, RefinedWares.superfluidcoolant]
+            },
+            production: {
+                [RefinedWares.superfluidcoolant]: 1
+            },
+            wallet: {
+                initialBalance: 100_000
             }
         }
     },

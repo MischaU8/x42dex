@@ -1,5 +1,5 @@
 import * as ex from 'excalibur';
-import { WaresType, Wares, WaresKey } from '../data/wares';
+import { WaresType, Wares } from '../data/wares';
 
 export class CargoComponent extends ex.Component {
     declare owner: ex.Actor
@@ -16,13 +16,13 @@ export class CargoComponent extends ex.Component {
 
     addItem(item: WaresType, amount: number) {
         this.items[item] = (this.items[item] || 0) + amount;
-        this.volume += Wares[item as WaresKey].volume * amount;
+        this.volume += Wares[item].volume * amount;
         ex.assert(`Cargo volume exceeded max volume: ${this.volume} > ${this.maxVolume}`, () => this.volume <= this.maxVolume);
     }
 
     removeItem(item: WaresType, amount: number) {
         this.items[item] = (this.items[item] || 0) - amount;
-        this.volume -= Wares[item as WaresKey].volume * amount;
+        this.volume -= Wares[item].volume * amount;
         ex.assert(`Cargo item amount exceeded min amount: ${this.items[item]} < 0`, () => this.items[item] >= 0);
         ex.assert(`Cargo volume exceeded min volume: ${this.volume} < 0`, () => this.volume >= 0);
         if (this.items[item] === 0) {
@@ -35,7 +35,7 @@ export class CargoComponent extends ex.Component {
     }
 
     getAvailableSpaceFor(item: WaresType): number {
-        return Math.floor(this.getAvailableSpace() / Wares[item as WaresKey].volume);
+        return Math.floor(this.getAvailableSpace() / Wares[item].volume);
     }
 
     getDetails(): string {

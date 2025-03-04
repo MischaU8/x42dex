@@ -22,7 +22,7 @@ export class ShipFactory {
         const shipImage = this.random.pickOne(config.possibleImages);
         const shipColor = this.random.pickOne(config.possibleColors);
         const ship = new Ship(
-            `${config.name} ${config.index}`,
+            `${config.name} ${this.createShipID()}`,
             shipImage,
             shipColor,
             this.map
@@ -32,6 +32,16 @@ export class ShipFactory {
         this.bindEvents(ship);
 
         return ship;
+    }
+
+    createShipID(): string {
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        const numbers = '0123456789'.split('');
+
+        const randomLetters = this.random.pickSet(letters, 3, true).join('');
+        const randomNumbers = this.random.pickSet(numbers, 3, true).join('');
+
+        return `${randomLetters}-${randomNumbers}`;
     }
 
     private addComponents(ship: Ship, config: ShipConfig) {

@@ -42,7 +42,7 @@ wallet ${this.owner.get(WalletComponent)?.getDetails()}
     getCargoDetailsWithPrices(): string {
         const cargo = this.owner.get(CargoComponent);
         let details = `${cargo.volume.toFixed(0)}/${cargo.maxVolume.toFixed(0)}m³`;
-        const prices = Object.entries(this.itemPrices).map(([item, price]) => `${item.padStart(8, " ")} ${cargo.items[item as WaresType] || 0}x ¢${price.toFixed(0)}`);
+        const prices = Object.entries(this.itemPrices).map(([item, price]) => `${item.padStart(16, " ")} ${cargo.items[item as WaresType] || 0}x ¢${price.toFixed(0)}`);
         details += `\n${prices.join('\n')}`;
         return details;
     }

@@ -178,9 +178,19 @@ export class MyLevel extends ex.Scene {
     }
 
     private spawnStations() {
+        // Keep track of stations by type to check distances
+        const stationsByType: Record<string, StaticSpaceObject[]> = {};
+
         for (const config of DefaultStationConfigs) {
+            stationsByType[config.name] = [];
+
             for (let i = 0; i < config.count; i++) {
-                const pos = this.getRandomPosWithMinDistance(Config.MinStationDistance);
+                const pos = this.getRandomPosWithMinDistanceForType(
+                    Config.MinStationDistance,
+                    Config.MinStationDistanceSameType,
+                    stationsByType[config.name]
+                );
+
                 if (pos.equals(ex.Vector.Zero)) {
                     console.log(`Failed to get a valid position for ${config.name} ${i}`);
                     break;
@@ -194,6 +204,9 @@ export class MyLevel extends ex.Scene {
 
                 this.add(station);
                 this.staticObjects.push(station);
+
+                // Add to type-specific tracking
+                stationsByType[config.name].push(station);
             }
         }
     }
@@ -283,6 +296,39 @@ export class MyLevel extends ex.Scene {
             if (!this.staticObjects.some(obj => obj.pos.distance(pos) < minDistance)) {
                 return pos;
             }
+        }
+        return ex.Vector.Zero;
+    }
+
+    private getRandomPosWithMinDistanceForType(
+        minDistance: number = 64,
+        minSameTypeDistance: number = 64,
+        sameTypeStations: StaticSpaceObject[],
+        maxAttempts: number = 25
+    ): ex.Vector {
+        const pos = ex.vec(0, 0);
+
+        for (let i = 0; i < maxAttempts; i++) {
+            pos.setTo(
+                this.random.integer(0, this.map.gridWidth)-this.map.hexWidth/2,
+                this.random.integer(0, this.map.gridHeight)-this.map.hexHeight*0.75
+            );
+
+            if (!this.map.isPointInMap(pos)) {
+                continue;
+            }
+
+            // Check distance from all other objects
+            if (this.staticObjects.some(obj => obj.pos.distance(pos) < minDistance)) {
+                continue;
+            }
+
+            // Additional check for same-type stations with larger minimum distance
+            if (sameTypeStations.some(station => station.pos.distance(pos) < minSameTypeDistance)) {
+                continue;
+            }
+
+            return pos;
         }
         return ex.Vector.Zero;
     }

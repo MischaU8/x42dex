@@ -32,6 +32,7 @@ export const Config = {
 
     // station
     MinStationDistance: 64 * worldSize,
+    MinStationDistanceSameType: 256 * worldSize,
 
     // autopilot
     AutoPilotLeadTime: 0.5,

@@ -121,7 +121,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
     {
         name: 'Ice Miner',
         role: 'miner',
-        count: 15,
+        count: 10,
         possibleImages: [Resources.ShipE, Resources.ShipG],
         possibleColors: [ex.Color.White],
         components: {
@@ -138,7 +138,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
     {
         name: 'Gas Miner',
         role: 'miner',
-        count: 45,
+        count: 30,
         possibleImages: [Resources.ShipE, Resources.ShipG],
         possibleColors: [ex.Color.Magenta],
         components: {

@@ -1,6 +1,6 @@
 import * as ex from 'excalibur';
 import { Resources } from '../resources';
-import { Wares } from './wares';
+import { Wares, Energy, RefinedGoods, Gases, Minerals, Agricultural, Hightech, Shiptech } from './wares';
 
 export type ShipRole = 'miner' | 'transport' | 'scout' | 'patrol';
 
@@ -108,33 +108,16 @@ export const DefaultShipConfigs: ShipConfig[] = [
         }
     },
     {
-        name: 'Solid Miner',
+        name: 'Mineral Miner',
         role: 'miner',
-        count: 30,
+        count: 10,
         possibleImages: [Resources.ShipE, Resources.ShipG],
         possibleColors: [ex.Color.Brown],
         components: {
             movement: DefaultMovementConfig,
             cargo: {
                 maxVolume: 1000,
-                resourceFilter: [Wares.ore, Wares.silicon]
-            },
-            wallet: { initialBalance: 0 },
-            autopilot: true,
-            autominer: DefaultAutominerConfig
-        }
-    },
-    {
-        name: 'Ice Miner',
-        role: 'miner',
-        count: 10,
-        possibleImages: [Resources.ShipE, Resources.ShipG],
-        possibleColors: [ex.Color.White],
-        components: {
-            movement: DefaultMovementConfig,
-            cargo: {
-                maxVolume: 1000,
-                resourceFilter: [Wares.ice]
+                resourceFilter: Minerals
             },
             wallet: { initialBalance: 0 },
             autopilot: true,
@@ -144,14 +127,14 @@ export const DefaultShipConfigs: ShipConfig[] = [
     {
         name: 'Gas Miner',
         role: 'miner',
-        count: 30,
+        count: 10,
         possibleImages: [Resources.ShipE, Resources.ShipG],
         possibleColors: [ex.Color.Magenta],
         components: {
             movement: DefaultMovementConfig,
             cargo: {
                 maxVolume: 1000,
-                resourceFilter: [Wares.helium, Wares.hydrogen, Wares.methane]
+                resourceFilter: Gases
             },
             wallet: { initialBalance: 0 },
             autopilot: true,
@@ -168,17 +151,150 @@ export const DefaultShipConfigs: ShipConfig[] = [
             movement: DefaultMovementConfig,
             cargo: {
                 maxVolume: 1000,
-                resourceFilter: [Wares.energycells]
+                resourceFilter: Energy
             },
             wallet: { initialBalance: 20_000 },
             autopilot: true,
             autotrader: {
-                tradeFilter: [Wares.energycells],
+                tradeFilter: Energy,
+                topNBuyers: 2,
+                topNSellers: 2,
+                initialRangeMultiplier: 16
+            }
+        }
+    },
+    {
+        name: 'Refined Goods Trader',
+        role: 'transport',
+        count: 10,
+        possibleImages: [Resources.ShipH],
+        possibleColors: [ex.Color.Gray],
+        components: {
+            movement: DefaultMovementConfig,
+            cargo: {
+                maxVolume: 1000,
+                resourceFilter: RefinedGoods
+            },
+            wallet: { initialBalance: 20_000 },
+            autopilot: true,
+            autotrader: {
+                tradeFilter: RefinedGoods,
+                topNBuyers: 2,
+                topNSellers: 2,
+                initialRangeMultiplier: 16
+            }
+        }
+    },
+    {
+        name: 'Gases Trader',
+        role: 'transport',
+        count: 5,
+        possibleImages: [Resources.ShipH],
+        possibleColors: [ex.Color.Magenta],
+        components: {
+            movement: DefaultMovementConfig,
+            cargo: {
+                maxVolume: 10000,
+                resourceFilter: Gases
+            },
+            wallet: { initialBalance: 50_000 },
+            autopilot: true,
+            autotrader: {
+                tradeFilter: Gases,
+                topNBuyers: 2,
+                topNSellers: 2,
+                initialRangeMultiplier: 16
+            }
+        }
+    },
+    {
+        name: 'Minerals Trader',
+        role: 'transport',
+        count: 5,
+        possibleImages: [Resources.ShipH],
+        possibleColors: [ex.Color.Brown],
+        components: {
+            movement: DefaultMovementConfig,
+            cargo: {
+                maxVolume: 10000,
+                resourceFilter: Minerals
+            },
+            wallet: { initialBalance: 50_000 },
+            autopilot: true,
+            autotrader: {
+                tradeFilter: Minerals,
+                topNBuyers: 2,
+                topNSellers: 2,
+                initialRangeMultiplier: 16
+            }
+        }
+    },
+    {
+        name: 'Agricultural Trader',
+        role: 'transport',
+        count: 5,
+        possibleImages: [Resources.ShipH],
+        possibleColors: [ex.Color.Green],
+        components: {
+            movement: DefaultMovementConfig,
+            cargo: {
+                maxVolume: 10000,
+                resourceFilter: Agricultural
+            },
+            wallet: { initialBalance: 50_000 },
+            autopilot: true,
+            autotrader: {
+                tradeFilter: Agricultural,
+                topNBuyers: 2,
+                topNSellers: 2,
+                initialRangeMultiplier: 16
+            }
+        }
+    },
+    {
+        name: 'Hightech Trader',
+        role: 'transport',
+        count: 5,
+        possibleImages: [Resources.ShipH],
+        possibleColors: [ex.Color.Pink],
+        components: {
+            movement: DefaultMovementConfig,
+            cargo: {
+                maxVolume: 10000,
+                resourceFilter: Hightech
+            },
+            wallet: { initialBalance: 50_000 },
+            autopilot: true,
+            autotrader: {
+                tradeFilter: Hightech,
+                topNBuyers: 2,
+                topNSellers: 2,
+                initialRangeMultiplier: 16
+            }
+        }
+    },
+    {
+        name: 'Shiptech Trader',
+        role: 'transport',
+        count: 5,
+        possibleImages: [Resources.ShipH],
+        possibleColors: [ex.Color.Purple],
+        components: {
+            movement: DefaultMovementConfig,
+            cargo: {
+                maxVolume: 10000,
+                resourceFilter: Shiptech
+            },
+            wallet: { initialBalance: 50_000 },
+            autopilot: true,
+            autotrader: {
+                tradeFilter: Shiptech,
                 topNBuyers: 2,
                 topNSellers: 2,
                 initialRangeMultiplier: 16
             }
         }
     }
+
     // Add more ship configurations as needed
 ];

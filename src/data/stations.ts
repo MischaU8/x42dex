@@ -85,6 +85,34 @@ export const DefaultStationConfigs: StationConfig[] = [
         }
     },
     {
+        name: 'Engine Parts Factory',
+        type: 'production',
+        count: 3,
+        possibleImages: [Resources.StationC],
+        possibleColors: [ex.Color.Brown],
+        components: {
+            cargo: {
+                maxVolume: 50_000,
+                resourceFilter: [Wares.antimattercells, Wares.energycells, Wares.refinedmetals, Wares.engineparts],
+                startAmount: {
+                    [Wares.antimattercells]: {min: 80, max: 160},
+                    [Wares.energycells]: {min: 60, max: 120},
+                    [Wares.refinedmetals]: {min: 96, max: 192},
+                    [Wares.engineparts]: {min: 208, max: 416},
+                },
+            },
+            production: {
+                jobs: {
+                    [Wares.engineparts]: 1
+                },
+                startJobs: true,
+            },
+            wallet: {
+                initialBalance: 100_000
+            }
+        }
+    },
+    {
         name: 'Graphene Refinery',
         type: 'production',
         count: 3,
@@ -103,6 +131,34 @@ export const DefaultStationConfigs: StationConfig[] = [
             production: {
                 jobs: {
                     [Wares.graphene]: 1
+                },
+                startJobs: true,
+            },
+            wallet: {
+                initialBalance: 100_000
+            }
+        }
+    },
+    {
+        name: 'Hull Parts Factory',
+        type: 'production',
+        count: 3,
+        possibleImages: [Resources.StationC],
+        possibleColors: [ex.Color.Brown],
+        components: {
+            cargo: {
+                maxVolume: 50_000,
+                resourceFilter: [Wares.energycells, Wares.graphene, Wares.refinedmetals, Wares.hullparts],
+                startAmount: {
+                    [Wares.energycells]: {min: 80, max: 160},
+                    [Wares.graphene]: {min: 40, max: 80},
+                    [Wares.refinedmetals]: {min: 280, max: 560},
+                    [Wares.hullparts]: {min: 294, max: 588},
+                },
+            },
+            production: {
+                jobs: {
+                    [Wares.hullparts]: 1
                 },
                 startJobs: true,
             },
@@ -139,6 +195,33 @@ export const DefaultStationConfigs: StationConfig[] = [
         }
     },
     {
+        name: 'Microchips Factory',
+        type: 'production',
+        count: 3,
+        possibleImages: [Resources.StationC],
+        possibleColors: [ex.Color.Brown],
+        components: {
+            cargo: {
+                maxVolume: 50_000,
+                resourceFilter: [Wares.energycells, Wares.siliconwafers, Wares.microchips],
+                startAmount: {
+                    [Wares.energycells]: {min: 50, max: 100},
+                    [Wares.siliconwafers]: {min: 200, max: 400},
+                    [Wares.microchips]: {min: 72, max: 144},
+                },
+            },
+            production: {
+                jobs: {
+                    [Wares.microchips]: 1
+                },
+                startJobs: true,
+            },
+            wallet: {
+                initialBalance: 100_000
+            }
+        }
+    },
+    {
         name: 'Ore Refinery',
         type: 'production',
         count: 3,
@@ -157,6 +240,34 @@ export const DefaultStationConfigs: StationConfig[] = [
             production: {
                 jobs: {
                     [Wares.refinedmetals]: 1
+                },
+                startJobs: true,
+            },
+            wallet: {
+                initialBalance: 100_000
+            }
+        }
+    },
+    {
+        name: 'Plasma Conductors Factory',
+        type: 'production',
+        count: 3,
+        possibleImages: [Resources.StationC],
+        possibleColors: [ex.Color.Brown],
+        components: {
+            cargo: {
+                maxVolume: 50_000,
+                resourceFilter: [Wares.energycells, Wares.graphene, Wares.superfluidcoolant, Wares.plasmaconductors],
+                startAmount: {
+                    [Wares.energycells]: {min: 60, max: 120},
+                    [Wares.graphene]: {min: 96, max: 192},
+                    [Wares.superfluidcoolant]: {min: 140, max: 280},
+                    [Wares.plasmaconductors]: {min: 44, max: 88},
+                },
+            },
+            production: {
+                jobs: {
+                    [Wares.plasmaconductors]: 1
                 },
                 startJobs: true,
             },
@@ -195,15 +306,15 @@ export const DefaultStationConfigs: StationConfig[] = [
     {
         name: 'Solar Power Plant',
         type: 'production',
-        count: 6,
+        count: 10,
         possibleImages: [Resources.StationB],
         possibleColors: [ex.Color.Yellow],
         components: {
             cargo: {
-                maxVolume: 10_000,
+                maxVolume: 50_000,
                 resourceFilter: [Wares.energycells],
                 startAmount: {
-                    [Wares.energycells]: {min: 175, max: 350},
+                    [Wares.energycells]: {min: 1750, max: 3500},
                 },
             },
             production: {
@@ -252,9 +363,11 @@ export const DefaultStationConfigs: StationConfig[] = [
         possibleColors: [ex.Color.ExcaliburBlue],
         components: {
             cargo: {
-                maxVolume: 100_000,
-                resourceFilter: [Wares.ore, Wares.silicon],
+                maxVolume: 1_000_000,
+                resourceFilter: [Wares.energycells, Wares.ice, Wares.ore, Wares.silicon],
                 startAmount: {
+                    [Wares.energycells]: {min: 1000, max: 5000},
+                    [Wares.ice]: {min: 1000, max: 5000},
                     [Wares.ore]: {min: 1000, max: 5000},
                     [Wares.silicon]: {min: 1000, max: 2000},
                 },

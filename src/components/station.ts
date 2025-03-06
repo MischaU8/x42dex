@@ -61,6 +61,15 @@ cargo ${this.getCargoDetailsWithPrices()}`;
         sourceWallet.balance += amount * price;
     }
 
+    calcMaxBuyAmount(item: Wares): number {
+        const targetCargo = this.owner.get(CargoComponent);
+        const targetSpace = targetCargo.getAvailableSpaceFor(item);
+        const targetWallet = this.owner.get(WalletComponent);
+        const price = this.getPriceQuote(item, 1);  // TODO fixed amount!
+        const targetCanAfford = targetWallet.balance / price;
+        return Math.floor(Math.min(targetSpace, targetCanAfford));
+    }
+
     tradeAllCargo(source: ex.Actor, target: ex.Actor, filter: Wares[], elapsed: number): boolean {
         const targetCargo = target.get(CargoComponent);
         const targetWallet = target.get(WalletComponent);

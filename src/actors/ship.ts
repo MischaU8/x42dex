@@ -161,6 +161,11 @@ autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
     this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, `follow ${ship.name}`));
   }
 
+  public orderCoast() {
+    this.get(AutopilotComponent)?.disable();
+    this.events.emit(ShipEvents.Status, new ShipStatusEvent(this, 'coasting'));
+  }
+
   private _clamp() {
     this.acc = this.acc.clampMagnitude(this.movement.maxAcceleration);
     this.vel = this.vel.clampMagnitude(this.movement.maxVelocity);

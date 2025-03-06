@@ -30,7 +30,7 @@ export const Config = {
     ShipWidth: 16,
     ShipHeight: 16,
 
-    MaxRangeMultiplier: 32,
+    MaxRangeMultiplier: 64,
 
     // station
     MinStationDistance: 64 * worldSize,

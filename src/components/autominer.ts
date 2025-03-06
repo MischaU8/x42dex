@@ -7,7 +7,6 @@ import { MinableComponent } from './minable';
 import { ShipTarget } from './autopilot';
 
 import { Wares } from '../data/wares';
-import { WalletComponent } from './wallet';
 import { StaticSpaceObject } from '../actors/StaticSpaceObject';
 import { Config } from '../config';
 
@@ -120,7 +119,12 @@ export class AutominerComponent extends ex.Component {
 
     onFindAstroidUpdate(_data: unknown, elapsed: number) {
         if (this.target) {
-            return;
+            if (!this.target.get(MinableComponent)?.amount) {
+                this.owner.orderCoast();
+                this.onFindAstroidEnter();
+            } else {
+                return;
+            }
         }
         const candidates = this.getNearbyAstroids();
         if (candidates.length === 0) {
@@ -150,7 +154,14 @@ export class AutominerComponent extends ex.Component {
 
     onFindStationUpdate(_data: unknown, elapsed: number) {
         if (this.target) {
-            return;
+            const shipCargo = this.owner.get(CargoComponent);
+            const station = this.target.get(StationComponent);
+            if (!Object.keys(shipCargo.items).some(item => station.calcMaxBuyAmount(item as Wares) > 0)) {
+                this.owner.orderCoast();
+                this.onFindStationEnter();
+            } else {
+                return;
+            }
         }
         const candidates = this.getNearbyStations();
         if (candidates.length === 0) {
@@ -165,7 +176,11 @@ export class AutominerComponent extends ex.Component {
     getNearbyStations(): StaticSpaceObject[] {
         const maxRange = this.rangeMultiplier * this.owner.sensorRadius;
         const shipCargo = this.owner.get(CargoComponent);
-        return this.level.staticObjects.filter(obj => obj.has(StationComponent) && !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange && obj.get(WalletComponent)?.balance >= 1000 && Object.keys(shipCargo.items).some(item => obj.get(StationComponent)?.itemPrices[item as Wares] > 0));
+        return this.level.staticObjects.filter(
+            obj => obj.has(StationComponent)
+            && !this.excludeTargets.includes(obj)
+            && this.owner.pos.distance(obj.pos) <= maxRange
+            && Object.keys(shipCargo.items).some(item => obj.get(StationComponent)?.itemPrices[item as Wares] > 0 && obj.get(StationComponent)?.calcMaxBuyAmount(item as Wares) > 0));
     }
 
     getNearbyStaticObject(candidates: StaticSpaceObject[], topN: number = 1): StaticSpaceObject {

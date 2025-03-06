@@ -6,7 +6,6 @@ import { StationComponent } from './station';
 import { ShipTarget } from './autopilot';
 
 import { Wares } from '../data/wares';
-import { WalletComponent } from './wallet';
 import { StaticSpaceObject } from '../actors/StaticSpaceObject';
 import { Config } from '../config';
 
@@ -133,14 +132,14 @@ export class AutotraderComponent extends ex.Component {
             obj => obj.has(StationComponent)
             && !this.excludeTargets.includes(obj)
             && this.owner.pos.distance(obj.pos) <= maxRange
-            && obj.get(WalletComponent)?.balance >= 1000
+            && obj.get(StationComponent)?.calcMaxBuyAmount(this.tradeProduct as Wares)
             && obj.get(StationComponent)?.itemPrices[this.tradeProduct as Wares] > 0);
     }
 
     onFindSellerUpdate(_data: unknown, elapsed: number) {
         if (this.target) {
             if (!this.target.get(CargoComponent)?.items[this.tradeProduct as Wares]) {
-                // console.log(this.owner.name, 'seller has no', this.tradeProduct, 'in stock, skipping');
+                this.owner.orderCoast();
                 this.onFindStationEnter();
             } else {
                 return;
@@ -161,7 +160,8 @@ export class AutotraderComponent extends ex.Component {
 
     onFindBuyerUpdate(_data: unknown, elapsed: number) {
         if (this.target) {
-            if (this.target.get(WalletComponent)?.balance < 1000) {
+            if (!this.target.get(StationComponent)?.calcMaxBuyAmount(this.tradeProduct as Wares)) {
+                this.owner.orderCoast();
                 this.onFindStationEnter();
             } else {
                 return;

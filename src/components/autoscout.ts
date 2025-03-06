@@ -4,6 +4,7 @@ import { MyLevel } from '../scenes/level';
 import { ShipTarget } from './autopilot';
 
 import { StaticSpaceObject } from '../actors/StaticSpaceObject';
+import { Config } from '../config';
 
 export class AutoscoutComponent extends ex.Component {
     declare owner: Ship;
@@ -95,7 +96,7 @@ export class AutoscoutComponent extends ex.Component {
         const candidates = this.getNearbyObjects();
         if (candidates.length === 0) {
             // console.log(this.owner.name, 'no useful astroids in range, increasing range');
-            this.rangeMultiplier *= 2;
+            this.rangeMultiplier = Math.min(this.rangeMultiplier * 2, Config.MaxRangeMultiplier);
             return;
         }
         this.target = this.getNearbyStaticObject(candidates, this.topNObjects);

@@ -2,6 +2,7 @@ import * as ex from 'excalibur';
 import { CargoComponent } from './cargo';
 import { WalletComponent } from './wallet';
 import { Wares, WaresData } from '../data/wares';
+import { ProductionComponent } from './production';
 
 export class StationComponent extends ex.Component {
     declare owner: ex.Actor
@@ -32,7 +33,9 @@ export class StationComponent extends ex.Component {
     getDetails(): string {
         return `[${this.owner.name}]
 wallet ${this.owner.get(WalletComponent)?.getDetails()}
- cargo ${this.getCargoDetailsWithPrices()}`;
+production
+${this.owner.get(ProductionComponent)?.getDetail()}
+cargo ${this.getCargoDetailsWithPrices()}`;
     }
 
     getPriceQuote(item: Wares, _amount: number): number {

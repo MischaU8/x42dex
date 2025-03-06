@@ -9,6 +9,7 @@ import { ShipTarget } from './autopilot';
 import { Wares } from '../data/wares';
 import { WalletComponent } from './wallet';
 import { StaticSpaceObject } from '../actors/StaticSpaceObject';
+import { Config } from '../config';
 
 export class AutominerComponent extends ex.Component {
     declare owner: Ship;
@@ -126,7 +127,7 @@ export class AutominerComponent extends ex.Component {
         const candidates = this.getNearbyAstroids();
         if (candidates.length === 0) {
             // console.log(this.owner.name, 'no useful astroids in range, increasing range');
-            this.rangeMultiplier *= 2;
+            this.rangeMultiplier = Math.min(this.rangeMultiplier * 2, Config.MaxRangeMultiplier);
             return;
         }
         this.target = this.getNearbyStaticObject(candidates, this.topNAstroids);
@@ -156,7 +157,7 @@ export class AutominerComponent extends ex.Component {
         const candidates = this.getNearbyStations();
         if (candidates.length === 0) {
             // console.log(this.owner.name, 'no useful stations in range, increasing range');
-            this.rangeMultiplier *= 2;
+            this.rangeMultiplier = Math.min(this.rangeMultiplier * 2, Config.MaxRangeMultiplier);
             return;
         }
         this.target = this.getNearbyStaticObject(candidates, this.topNStations);
@@ -241,8 +242,6 @@ export class AutominerComponent extends ex.Component {
                 shipWallet.balance += transferAmount * price;
                 // console.log(this.owner.name, 'transferred', transferAmount, 'of', item, 'to station');
                 return;
-            } else {
-                break;
             }
         }
         this.machine.go('IDLE');

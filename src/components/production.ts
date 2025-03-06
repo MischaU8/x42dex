@@ -55,6 +55,10 @@ export class ProductionComponent extends ex.Component {
         timer.start();
     }
 
+    getDetail(): string {
+        return this.productionJobs.map(job => `${job.jobType.output.padStart(16, " ")} ${job.running ? `${Math.floor(job.timeRemaining)}/${job.jobType.cycleTime}s` : 'idle'}`).join('\n');
+    }
+
     private updateProductionJobs(delta: number) {
         for (const job of this.productionJobs) {
             if (job.running) {

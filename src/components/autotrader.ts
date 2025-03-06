@@ -56,12 +56,12 @@ export class AutotraderComponent extends ex.Component {
         }
     })
 
-    constructor(level: MyLevel, tradeFilter: Wares[], topNSellers: number = 1, topNBuyers: number = 1, initialRangeMultiplier: number = 2) {
+    constructor(level: MyLevel, tradeFilter: Wares[], topNBuyers: number = 1, topNSellers: number = 1, initialRangeMultiplier: number = 2) {
         super();
         this.level = level;
         this.tradeFilter = tradeFilter;
-        this.topNSellers = topNSellers;
         this.topNBuyers = topNBuyers;
+        this.topNSellers = topNSellers;
         this.initialRangeMultiplier = initialRangeMultiplier;
     }
 
@@ -111,13 +111,11 @@ export class AutotraderComponent extends ex.Component {
             this.excludeTargets.push(this.target);
         }
         this.target = null;
-
     }
 
     resetRangeMultiplier() {
         this.rangeMultiplier = 0;
     }
-
 
     getNearbySellers(): StaticSpaceObject[] {
         const maxRange = this.rangeMultiplier * this.owner.sensorRadius;
@@ -141,7 +139,12 @@ export class AutotraderComponent extends ex.Component {
 
     onFindSellerUpdate(_data: unknown, elapsed: number) {
         if (this.target) {
-            return;
+            if (!this.target.get(CargoComponent)?.items[this.tradeProduct as Wares]) {
+                // console.log(this.owner.name, 'seller has no', this.tradeProduct, 'in stock, skipping');
+                this.onFindStationEnter();
+            } else {
+                return;
+            }
         }
         const candidates = this.getNearbySellers();
         if (candidates.length === 0) {
@@ -158,7 +161,11 @@ export class AutotraderComponent extends ex.Component {
 
     onFindBuyerUpdate(_data: unknown, elapsed: number) {
         if (this.target) {
-            return;
+            if (this.target.get(WalletComponent)?.balance < 1000) {
+                this.onFindStationEnter();
+            } else {
+                return;
+            }
         }
         const candidates = this.getNearbyBuyers();
         if (candidates.length === 0) {

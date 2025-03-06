@@ -7,7 +7,7 @@ import { ProductionComponent } from './production';
 export class StationComponent extends ex.Component {
     declare owner: ex.Actor
     itemPrices: { [key in Wares]: number }
-    unloadAmount: number = 100;
+    unloadAmount: number = 1000;
 
     private random: ex.Random;
 

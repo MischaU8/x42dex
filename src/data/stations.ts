@@ -195,12 +195,12 @@ export const DefaultStationConfigs: StationConfig[] = [
     {
         name: 'Solar Power Plant',
         type: 'production',
-        count: 5,
+        count: 6,
         possibleImages: [Resources.StationB],
         possibleColors: [ex.Color.Yellow],
         components: {
             cargo: {
-                maxVolume: 50_000,
+                maxVolume: 10_000,
                 resourceFilter: [Wares.energycells],
                 startAmount: {
                     [Wares.energycells]: {min: 175, max: 350},
@@ -208,7 +208,7 @@ export const DefaultStationConfigs: StationConfig[] = [
             },
             production: {
                 jobs: {
-                    [Wares.energycells]: 1
+                    [Wares.energycells]: 4
                 },
                 startJobs: true,
             },

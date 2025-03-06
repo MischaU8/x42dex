@@ -87,15 +87,19 @@ export class ProductionComponent extends ex.Component {
         }
         job.running = true;
         job.timeRemaining = job.jobType.cycleTime;
-        console.log('START', this.owner.name, job.jobType.output, job.jobType.cycleTime);
+        console.log('PRODUCTIONSTART', this.owner.name, job.jobType.output, job.jobType.cycleTime);
     }
 
     private finishJob(job: ProductionJobData) {
         job.running = false;
         job.timeRemaining = 0;
         const cargo = this.owner.get(CargoComponent);
-        cargo.addItem(job.jobType.output, job.jobType.batchSize);
-        console.log('FINISH', this.owner.name, job.jobType.output, job.jobType.batchSize);
+        const transferAmount = Math.min(cargo.getAvailableSpaceFor(job.jobType.output), job.jobType.batchSize);
+        if (transferAmount < job.jobType.batchSize) {
+            console.log('PRODUCTION', this.owner.name, job.jobType.output, transferAmount, 'not enough space for full batch');
+        }
+        cargo.addItem(job.jobType.output, transferAmount);
+        console.log('PRODUCTION FINISH', this.owner.name, job.jobType.output, transferAmount);
     }
 
 }

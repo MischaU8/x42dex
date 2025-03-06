@@ -16,7 +16,6 @@ export class AutominerComponent extends ex.Component {
     declare level: MyLevel;
 
     mineAmount: number = 100;
-    unloadAmount: number = 100;
     unloadThreshold: number = 0.5;
     topNAstroids: number = 5;
     topNStations: number = 2;
@@ -58,11 +57,10 @@ export class AutominerComponent extends ex.Component {
         }
     })
 
-    constructor(level: MyLevel, mineAmount: number = 100, unloadAmount: number = 100, unloadThreshold: number = 0.5, topNAstroids: number = 5, topNStations: number = 2, initialRangeMultiplier: number = 1) {
+    constructor(level: MyLevel, mineAmount: number = 100, unloadThreshold: number = 0.5, topNAstroids: number = 5, topNStations: number = 2, initialRangeMultiplier: number = 1) {
         super();
         this.level = level;
         this.mineAmount = mineAmount;
-        this.unloadAmount = unloadAmount;
         this.unloadThreshold = unloadThreshold;
         this.topNAstroids = topNAstroids;
         this.topNStations = topNStations;
@@ -224,26 +222,10 @@ export class AutominerComponent extends ex.Component {
         }
         // console.log(this.owner.name, 'deliver cargo', elapsed);
         const station = this.target.get(StationComponent);
-        const stationCargo = this.target.get(CargoComponent);
-        const stationWallet = this.target.get(WalletComponent);
-        const shipCargo = this.owner.get(CargoComponent);
-        const shipWallet = this.owner.get(WalletComponent);
-        for (const [item, amount] of Object.entries(shipCargo.items)) {
-            const shipTransferAmount = Math.floor(Math.min(this.unloadAmount * elapsed / 1000, amount));
-            const stationSpace = stationCargo.getAvailableSpaceFor(item as Wares);
-            const price = station.getPriceQuote(item as Wares, amount);
-            const stationCanAfford = Math.floor(stationWallet.balance / price);
-            const stationTransferAmount = Math.floor(Math.min(stationSpace, stationCanAfford));
-            const transferAmount = Math.min(shipTransferAmount, stationTransferAmount);
-            if (transferAmount > 0) {
-                stationCargo.addItem(item as Wares, transferAmount);
-                shipCargo.removeItem(item as Wares, transferAmount);
-                stationWallet.balance -= transferAmount * price;
-                shipWallet.balance += transferAmount * price;
-                // console.log(this.owner.name, 'transferred', transferAmount, 'of', item, 'to station');
-                return;
-            }
+        const cargo = this.owner.get(CargoComponent);
+        const hasTraded = station.tradeAllCargo(this.owner, this.target, cargo.resourceFilter,elapsed);
+        if (!hasTraded) {
+            this.machine.go('IDLE');
         }
-        this.machine.go('IDLE');
     }
 }

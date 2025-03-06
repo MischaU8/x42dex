@@ -10,6 +10,7 @@ import { AutominerComponent } from "../components/autominer";
 import { WalletComponent } from "../components/wallet";
 import { MovementComponent } from "../components/movement";
 import { AutoscoutComponent } from "../components/autoscout";
+import { AutotraderComponent } from "../components/autotrader";
 
 export type ShipEvents = {
   status: ShipStatusEvent;
@@ -101,6 +102,7 @@ wallet ${this.get(WalletComponent)?.getDetails() || '-'}
 
 autominer ${this.get(AutominerComponent)?.getDetails() || 'off'}
 autoscout ${this.get(AutoscoutComponent)?.getDetails() || 'off'}
+autotrader ${this.get(AutotraderComponent)?.getDetails() || 'off'}
 autopilot ${this.get(AutopilotComponent)?.enabled ? 'on' : 'off'}
    target ${this.get(AutopilotComponent)?.getTargetDetails()}`;
   }

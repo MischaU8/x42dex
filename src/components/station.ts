@@ -7,6 +7,7 @@ import { ProductionComponent } from './production';
 export class StationComponent extends ex.Component {
     declare owner: ex.Actor
     itemPrices: { [key in Wares]: number }
+    unloadAmount: number = 100;
 
     private random: ex.Random;
 
@@ -48,4 +49,38 @@ cargo ${this.getCargoDetailsWithPrices()}`;
         details += `\n${prices.join('\n')}`;
         return details;
     }
+
+    tradeCargo(source: ex.Actor, target: ex.Actor, type: Wares, amount: number, price: number) {
+        const sourceCargo = source.get(CargoComponent);
+        const targetCargo = target.get(CargoComponent);
+        targetCargo.addItem(type, amount);
+        sourceCargo.removeItem(type, amount);
+        const sourceWallet = source.get(WalletComponent);
+        const targetWallet = target.get(WalletComponent);
+        targetWallet.balance -= amount * price;
+        sourceWallet.balance += amount * price;
+    }
+
+    tradeAllCargo(source: ex.Actor, target: ex.Actor, filter: Wares[], elapsed: number): boolean {
+        const targetCargo = target.get(CargoComponent);
+        const targetWallet = target.get(WalletComponent);
+        const sourceCargo = source.get(CargoComponent);
+        for (const [item, amount] of Object.entries(sourceCargo.items) as [Wares, number][]) {
+            if (!filter.includes(item as Wares)) {
+                continue;
+            }
+            const price = this.getPriceQuote(item, amount);
+            const sourceTransferAmount = Math.min(this.unloadAmount * elapsed / 1000, amount);
+            const targetSpace = targetCargo.getAvailableSpaceFor(item);
+            const targetCanAffordCanAfford = targetWallet.balance / price;
+            const targetTransferAmount = Math.floor(Math.min(targetSpace, targetCanAffordCanAfford));
+            const transferAmount = Math.floor(Math.min(sourceTransferAmount, targetTransferAmount));
+            if (transferAmount > 0) {
+                this.tradeCargo(source, target, item, transferAmount, price);
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

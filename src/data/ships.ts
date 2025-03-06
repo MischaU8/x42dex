@@ -43,6 +43,12 @@ export interface ShipConfig {
             rememberNObjects?: number;
             initialRangeMultiplier?: number;
         };
+        autotrader?: {
+            tradeFilter: Wares[];
+            topNBuyers?: number;
+            topNSellers?: number;
+            initialRangeMultiplier?: number;
+        };
     };
     index?: number;
 }
@@ -150,6 +156,28 @@ export const DefaultShipConfigs: ShipConfig[] = [
             wallet: { initialBalance: 0 },
             autopilot: true,
             autominer: DefaultAutominerConfig
+        }
+    },
+    {
+        name: 'Energy Trader',
+        role: 'transport',
+        count: 20,
+        possibleImages: [Resources.ShipH],
+        possibleColors: [ex.Color.Yellow],
+        components: {
+            movement: DefaultMovementConfig,
+            cargo: {
+                maxVolume: 1000,
+                resourceFilter: [Wares.energycells]
+            },
+            wallet: { initialBalance: 20_000 },
+            autopilot: true,
+            autotrader: {
+                tradeFilter: [Wares.energycells],
+                topNBuyers: 2,
+                topNSellers: 2,
+                initialRangeMultiplier: 16
+            }
         }
     }
     // Add more ship configurations as needed

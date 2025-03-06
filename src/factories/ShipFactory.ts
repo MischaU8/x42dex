@@ -9,6 +9,7 @@ import { WalletComponent } from "../components/wallet";
 import { AutominerComponent } from "../components/autominer";
 import { AutopilotComponent } from "../components/autopilot";
 import { AutoscoutComponent } from "../components/autoscout";
+import { AutotraderComponent } from "../components/autotrader";
 import { MovementComponent } from "../components/movement";
 
 export class ShipFactory {
@@ -76,11 +77,19 @@ export class ShipFactory {
             const am = config.components.autominer;
             ship.addComponent(new AutominerComponent(this.scene,
                 this.random.integer(am.minMineAmount!, am.maxMineAmount!),
-                this.random.integer(am.minUnloadAmount!, am.maxUnloadAmount!),
                 this.random.floating(am.minUnloadThreshold!, am.maxUnloadThreshold!),
                 this.random.integer(am.minTopNAstroids!, am.maxTopNAstroids!),
                 this.random.integer(am.minTopNStations!, am.maxTopNStations!),
                 am.initialRangeMultiplier!
+            ));
+        }
+        if (config.components.autotrader) {
+            const at = config.components.autotrader;
+            ship.addComponent(new AutotraderComponent(this.scene,
+                at.tradeFilter,
+                at.topNBuyers,
+                at.topNSellers,
+                at.initialRangeMultiplier
             ));
         }
         if (config.components.autoscout) {

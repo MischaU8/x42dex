@@ -1,10 +1,10 @@
 import * as ex from 'excalibur';
 
 import { Resources } from '../resources';
-import { MinableWares } from './wares';
+import { Wares } from './wares';
 
 export const AstroidTypes = {
-    [MinableWares.ore]: {
+    [Wares.ore]: {
         name: 'Ore',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
@@ -13,7 +13,7 @@ export const AstroidTypes = {
         image: Resources.AstroidA,
         color: ex.Color.Brown,
     },
-    [MinableWares.silicon]: {
+    [Wares.silicon]: {
         name: 'Silicon',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
@@ -22,7 +22,7 @@ export const AstroidTypes = {
         image: Resources.AstroidB,
         color: ex.Color.Gray
     },
-    [MinableWares.ice]: {
+    [Wares.ice]: {
         name: 'Ice',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
@@ -31,7 +31,7 @@ export const AstroidTypes = {
         image: Resources.AstroidC,
         color: ex.Color.Azure
     },
-    [MinableWares.helium]: {
+    [Wares.helium]: {
         name: 'Helium',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
@@ -40,7 +40,7 @@ export const AstroidTypes = {
         image: Resources.AstroidD,
         color: ex.Color.Blue
     },
-    [MinableWares.hydrogen]: {
+    [Wares.hydrogen]: {
         name: 'Hydrogen',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,
@@ -49,7 +49,7 @@ export const AstroidTypes = {
         image: Resources.AstroidD,
         color: ex.Color.Purple
     },
-    [MinableWares.methane]: {
+    [Wares.methane]: {
         name: 'Methane',
         minRespawnRate: 0.1,
         maxRespawnRate: 1.0,

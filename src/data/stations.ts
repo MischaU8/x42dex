@@ -1,7 +1,7 @@
 import * as ex from 'excalibur';
 
 import { Resources } from "../resources";
-import { WaresType, RefinedWares, MinableWares, EnergyWares, HighTechWares, WaterWares } from './wares';
+import { Wares } from './wares';
 
 export type StationType = 'production' | 'equipmentdock' | 'shipyard' | 'trade' | 'wharf';
 
@@ -14,10 +14,10 @@ export interface StationConfig {
     components: {
         cargo?: {
             maxVolume?: number;
-            resourceFilter: WaresType[];
+            resourceFilter: Wares[];
         };
         production?: {
-            [key in WaresType]?: number;
+            [key in Wares]?: number;
         };
         wallet?: {
             initialBalance?: number;
@@ -36,10 +36,10 @@ export const DefaultStationConfigs: StationConfig[] = [
         components: {
             cargo: {
                 maxVolume: 50_000,
-                resourceFilter: [EnergyWares.energycells, RefinedWares.graphene, RefinedWares.refinedmetals, HighTechWares.advancedcomposites]
+                resourceFilter: [Wares.energycells, Wares.graphene, Wares.refinedmetals, Wares.advancedcomposites]
             },
             production: {
-                [HighTechWares.advancedcomposites]: 1
+                [Wares.advancedcomposites]: 1
             },
             wallet: {
                 initialBalance: 100_000
@@ -55,10 +55,10 @@ export const DefaultStationConfigs: StationConfig[] = [
         components: {
             cargo: {
                 maxVolume: 50_000,
-                resourceFilter: [EnergyWares.energycells, MinableWares.hydrogen, RefinedWares.antimattercells]
+                resourceFilter: [Wares.energycells, Wares.hydrogen, Wares.antimattercells]
             },
             production: {
-                [RefinedWares.antimattercells]: 1
+                [Wares.antimattercells]: 1
             },
             wallet: {
                 initialBalance: 100_000
@@ -74,10 +74,10 @@ export const DefaultStationConfigs: StationConfig[] = [
         components: {
             cargo: {
                 maxVolume: 50_000,
-                resourceFilter: [EnergyWares.energycells, MinableWares.methane, RefinedWares.graphene]
+                resourceFilter: [Wares.energycells, Wares.methane, Wares.graphene]
             },
             production: {
-                [RefinedWares.graphene]: 1
+                [Wares.graphene]: 1
             },
             wallet: {
                 initialBalance: 100_000
@@ -93,10 +93,10 @@ export const DefaultStationConfigs: StationConfig[] = [
         components: {
             cargo: {
                 maxVolume: 50_000,
-                resourceFilter: [MinableWares.ice, WaterWares.water]
+                resourceFilter: [Wares.ice, Wares.water]
             },
             production: {
-                [WaterWares.water]: 1
+                [Wares.water]: 1
             },
             wallet: {
                 initialBalance: 100_000
@@ -112,10 +112,10 @@ export const DefaultStationConfigs: StationConfig[] = [
         components: {
             cargo: {
                 maxVolume: 50_000,
-                resourceFilter: [MinableWares.ore, RefinedWares.refinedmetals]
+                resourceFilter: [Wares.ore, Wares.refinedmetals]
             },
             production: {
-                [RefinedWares.refinedmetals]: 1
+                [Wares.refinedmetals]: 1
             },
             wallet: {
                 initialBalance: 100_000
@@ -131,10 +131,10 @@ export const DefaultStationConfigs: StationConfig[] = [
         components: {
             cargo: {
                 maxVolume: 50_000,
-                resourceFilter: [EnergyWares.energycells, MinableWares.silicon, RefinedWares.siliconwafers]
+                resourceFilter: [Wares.energycells, Wares.silicon, Wares.siliconwafers]
             },
             production: {
-                [RefinedWares.siliconwafers]: 1
+                [Wares.siliconwafers]: 1
             },
             wallet: {
                 initialBalance: 100_000
@@ -150,10 +150,10 @@ export const DefaultStationConfigs: StationConfig[] = [
         components: {
             cargo: {
                 maxVolume: 50_000,
-                resourceFilter: [EnergyWares.energycells]
+                resourceFilter: [Wares.energycells]
             },
             production: {
-                [EnergyWares.energycells]: 1
+                [Wares.energycells]: 1
             },
             wallet: {
                 initialBalance: 0
@@ -169,10 +169,10 @@ export const DefaultStationConfigs: StationConfig[] = [
         components: {
             cargo: {
                 maxVolume: 50_000,
-                resourceFilter: [EnergyWares.energycells, MinableWares.helium, RefinedWares.superfluidcoolant]
+                resourceFilter: [Wares.energycells, Wares.helium, Wares.superfluidcoolant]
             },
             production: {
-                [RefinedWares.superfluidcoolant]: 1
+                [Wares.superfluidcoolant]: 1
             },
             wallet: {
                 initialBalance: 100_000
@@ -188,7 +188,7 @@ export const DefaultStationConfigs: StationConfig[] = [
         components: {
             cargo: {
                 maxVolume: 100_000,
-                resourceFilter: [MinableWares.ore, MinableWares.silicon]
+                resourceFilter: [Wares.ore, Wares.silicon]
             },
             wallet: {
                 initialBalance: 1_000_000

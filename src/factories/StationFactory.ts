@@ -8,6 +8,7 @@ import { WalletComponent } from "../components/wallet";
 import { MyLevel } from "../scenes/level";
 import { Resources } from "../resources";
 import { StationConfig } from "../data/stations";
+import { ProductionComponent } from "../components/production";
 
 export class StationFactory {
     constructor(
@@ -42,6 +43,10 @@ export class StationFactory {
             station.addComponent(new WalletComponent(wallet.initialBalance));
         }
         station.addComponent(new StationComponent(this.random));
+        const production = config.components?.production;
+        if (production) {
+            station.addComponent(new ProductionComponent(this.scene, production));
+        }
     }
 
     private bindEvents(station: StaticSpaceObject) {

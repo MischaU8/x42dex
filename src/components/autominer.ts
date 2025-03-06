@@ -6,7 +6,7 @@ import { StationComponent } from './station';
 import { MinableComponent } from './minable';
 import { ShipTarget } from './autopilot';
 
-import { WaresType } from '../data/wares';
+import { Wares } from '../data/wares';
 import { WalletComponent } from './wallet';
 import { StaticSpaceObject } from '../actors/StaticSpaceObject';
 
@@ -166,7 +166,7 @@ export class AutominerComponent extends ex.Component {
     getNearbyStations(): StaticSpaceObject[] {
         const maxRange = this.rangeMultiplier * this.owner.sensorRadius;
         const shipCargo = this.owner.get(CargoComponent);
-        return this.level.staticObjects.filter(obj => obj.has(StationComponent) && !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange && obj.get(WalletComponent)?.balance >= 1000 && Object.keys(shipCargo.items).some(item => obj.get(StationComponent)?.itemPrices[item as WaresType] > 0));
+        return this.level.staticObjects.filter(obj => obj.has(StationComponent) && !this.excludeTargets.includes(obj) && this.owner.pos.distance(obj.pos) <= maxRange && obj.get(WalletComponent)?.balance >= 1000 && Object.keys(shipCargo.items).some(item => obj.get(StationComponent)?.itemPrices[item as Wares] > 0));
     }
 
     getNearbyStaticObject(candidates: StaticSpaceObject[], topN: number = 1): StaticSpaceObject {
@@ -229,14 +229,14 @@ export class AutominerComponent extends ex.Component {
         const shipWallet = this.owner.get(WalletComponent);
         for (const [item, amount] of Object.entries(shipCargo.items)) {
             const shipTransferAmount = Math.floor(Math.min(this.unloadAmount * elapsed / 1000, amount));
-            const stationSpace = stationCargo.getAvailableSpaceFor(item as WaresType);
-            const price = station.getPriceQuote(item as WaresType, amount);
+            const stationSpace = stationCargo.getAvailableSpaceFor(item as Wares);
+            const price = station.getPriceQuote(item as Wares, amount);
             const stationCanAfford = Math.floor(stationWallet.balance / price);
             const stationTransferAmount = Math.floor(Math.min(stationSpace, stationCanAfford));
             const transferAmount = Math.min(shipTransferAmount, stationTransferAmount);
             if (transferAmount > 0) {
-                stationCargo.addItem(item as WaresType, transferAmount);
-                shipCargo.removeItem(item as WaresType, transferAmount);
+                stationCargo.addItem(item as Wares, transferAmount);
+                shipCargo.removeItem(item as Wares, transferAmount);
                 stationWallet.balance -= transferAmount * price;
                 shipWallet.balance += transferAmount * price;
                 // console.log(this.owner.name, 'transferred', transferAmount, 'of', item, 'to station');

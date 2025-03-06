@@ -5,7 +5,7 @@ import { StaticSpaceObject } from "../actors/StaticSpaceObject";
 import { MinableComponent } from "../components/minable";
 import { MyLevel } from "../scenes/level";
 import { AstroidTypes, AstroidTypeKey } from "../data/astroids";
-import { MinableWares } from "../data/wares";
+import { Wares } from "../data/wares";
 
 export interface AstroidConfig {
     name: string;
@@ -38,7 +38,7 @@ export class AstroidFactory {
 
     private addComponents(astroid: StaticSpaceObject, typeKey: AstroidTypeKey, type: typeof AstroidTypes[AstroidTypeKey]) {
         astroid.addComponent(new MinableComponent(
-            typeKey as MinableWares,
+            typeKey as Wares,
             this.random.integer(type.minAmount, type.maxAmount),
             type.maxAmount,
             this.random.floating(type.minRespawnRate, type.maxRespawnRate),

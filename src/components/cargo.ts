@@ -1,28 +1,28 @@
 import * as ex from 'excalibur';
-import { WaresType, Wares } from '../data/wares';
+import { Wares, WaresData } from '../data/wares';
 
 export class CargoComponent extends ex.Component {
     declare owner: ex.Actor
 
-    items: Record<WaresType, number> = {} as Record<WaresType, number>;
+    items: Record<Wares, number> = {} as Record<Wares, number>;
     volume: number = 0;
     maxVolume: number = 0;
-    resourceFilter: WaresType[] = [];
-    constructor(maxVolume: number = 0, resourceFilter: WaresType[] = []) {
+    resourceFilter: Wares[] = [];
+    constructor(maxVolume: number = 0, resourceFilter: Wares[] = []) {
         super();
         this.maxVolume = maxVolume;
         this.resourceFilter = resourceFilter;
     }
 
-    addItem(item: WaresType, amount: number) {
+    addItem(item: Wares, amount: number) {
         this.items[item] = (this.items[item] || 0) + amount;
-        this.volume += Wares[item].volume * amount;
+        this.volume += WaresData[item].volume * amount;
         ex.assert(`Cargo volume exceeded max volume: ${this.volume} > ${this.maxVolume}`, () => this.volume <= this.maxVolume);
     }
 
-    removeItem(item: WaresType, amount: number) {
+    removeItem(item: Wares, amount: number) {
         this.items[item] = (this.items[item] || 0) - amount;
-        this.volume -= Wares[item].volume * amount;
+        this.volume -= WaresData[item].volume * amount;
         ex.assert(`Cargo item amount exceeded min amount: ${this.items[item]} < 0`, () => this.items[item] >= 0);
         ex.assert(`Cargo volume exceeded min volume: ${this.volume} < 0`, () => this.volume >= 0);
         if (this.items[item] === 0) {
@@ -34,8 +34,8 @@ export class CargoComponent extends ex.Component {
         return this.maxVolume - this.volume;
     }
 
-    getAvailableSpaceFor(item: WaresType): number {
-        return Math.floor(this.getAvailableSpace() / Wares[item].volume);
+    getAvailableSpaceFor(item: Wares): number {
+        return Math.floor(this.getAvailableSpace() / WaresData[item].volume);
     }
 
     getDetails(): string {

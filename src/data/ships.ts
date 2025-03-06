@@ -1,6 +1,6 @@
 import * as ex from 'excalibur';
 import { Resources } from '../resources';
-import { MinableWares, WaresType } from './wares';
+import { Wares } from './wares';
 
 export type ShipRole = 'miner' | 'transport' | 'scout' | 'patrol';
 
@@ -19,7 +19,7 @@ export interface ShipConfig {
         };
         cargo?: {
             maxVolume?: number;
-            resourceFilter: WaresType[];
+            resourceFilter: Wares[];
         };
         wallet?: {
             initialBalance?: number;
@@ -84,7 +84,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
     {
         name: 'Scout',
         role: 'scout',
-        count: 50,
+        count: 0,   // disable for now
         possibleImages: [Resources.ShipA, Resources.ShipB],
         possibleColors: [ex.Color.Yellow, ex.Color.White, ex.Color.Red],
         components: {
@@ -111,7 +111,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
             movement: DefaultMovementConfig,
             cargo: {
                 maxVolume: 1000,
-                resourceFilter: [MinableWares.ore, MinableWares.silicon]
+                resourceFilter: [Wares.ore, Wares.silicon]
             },
             wallet: { initialBalance: 0 },
             autopilot: true,
@@ -128,7 +128,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
             movement: DefaultMovementConfig,
             cargo: {
                 maxVolume: 1000,
-                resourceFilter: [MinableWares.ice]
+                resourceFilter: [Wares.ice]
             },
             wallet: { initialBalance: 0 },
             autopilot: true,
@@ -145,7 +145,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
             movement: DefaultMovementConfig,
             cargo: {
                 maxVolume: 1000,
-                resourceFilter: [MinableWares.helium, MinableWares.hydrogen, MinableWares.methane]
+                resourceFilter: [Wares.helium, Wares.hydrogen, Wares.methane]
             },
             wallet: { initialBalance: 0 },
             autopilot: true,

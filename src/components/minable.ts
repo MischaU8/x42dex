@@ -1,15 +1,15 @@
 import * as ex from 'excalibur'
-import { MinableWares } from '../data/wares'
+import { Wares } from '../data/wares'
 import { StaticSpaceObject } from '../actors/StaticSpaceObject'
 export class MinableComponent extends ex.Component {
   declare owner: StaticSpaceObject
 
-  type: MinableWares
+  type: Wares
   amount: number
   maxAmount: number
   respawnRate: number
 
-  constructor(type: MinableWares, amount: number, maxAmount: number, respawnRate: number) {
+  constructor(type: Wares, amount: number, maxAmount: number, respawnRate: number) {
     super()
     this.type = type
     this.amount = amount

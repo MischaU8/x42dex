@@ -53,7 +53,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -80,7 +80,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -108,7 +108,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -135,7 +135,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -163,7 +163,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -190,7 +190,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -217,7 +217,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -244,7 +244,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -272,7 +272,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -299,7 +299,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },
@@ -351,7 +351,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                 startJobs: true,
             },
             wallet: {
-                initialBalance: 100_000
+                initialBalance: 250_000
             }
         }
     },

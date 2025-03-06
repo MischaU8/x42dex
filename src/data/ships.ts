@@ -116,7 +116,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
         components: {
             movement: DefaultMovementConfig,
             cargo: {
-                maxVolume: 1000,
+                maxVolume: 2500,
                 resourceFilter: Minerals
             },
             wallet: { initialBalance: 0 },
@@ -133,7 +133,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
         components: {
             movement: DefaultMovementConfig,
             cargo: {
-                maxVolume: 1000,
+                maxVolume: 2500,
                 resourceFilter: Gases
             },
             wallet: { initialBalance: 0 },
@@ -150,7 +150,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
         components: {
             movement: DefaultMovementConfig,
             cargo: {
-                maxVolume: 1000,
+                maxVolume: 2500,
                 resourceFilter: Energy
             },
             wallet: { initialBalance: 20_000 },
@@ -172,7 +172,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
         components: {
             movement: DefaultMovementConfig,
             cargo: {
-                maxVolume: 1000,
+                maxVolume: 2500,
                 resourceFilter: RefinedGoods
             },
             wallet: { initialBalance: 20_000 },
@@ -194,7 +194,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
         components: {
             movement: DefaultMovementConfig,
             cargo: {
-                maxVolume: 10000,
+                maxVolume: 2500,
                 resourceFilter: Gases
             },
             wallet: { initialBalance: 50_000 },
@@ -216,7 +216,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
         components: {
             movement: DefaultMovementConfig,
             cargo: {
-                maxVolume: 10000,
+                maxVolume: 2500,
                 resourceFilter: Minerals
             },
             wallet: { initialBalance: 50_000 },
@@ -238,7 +238,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
         components: {
             movement: DefaultMovementConfig,
             cargo: {
-                maxVolume: 10000,
+                maxVolume: 2500,
                 resourceFilter: Agricultural
             },
             wallet: { initialBalance: 50_000 },
@@ -260,7 +260,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
         components: {
             movement: DefaultMovementConfig,
             cargo: {
-                maxVolume: 10000,
+                maxVolume: 2500,
                 resourceFilter: Hightech
             },
             wallet: { initialBalance: 50_000 },
@@ -282,7 +282,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
         components: {
             movement: DefaultMovementConfig,
             cargo: {
-                maxVolume: 10000,
+                maxVolume: 2500,
                 resourceFilter: Shiptech
             },
             wallet: { initialBalance: 50_000 },

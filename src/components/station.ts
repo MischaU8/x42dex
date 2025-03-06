@@ -33,8 +33,7 @@ export class StationComponent extends ex.Component {
     getDetails(): string {
         return `[${this.owner.name}]
 wallet ${this.owner.get(WalletComponent)?.getDetails()}
-production
-${this.owner.get(ProductionComponent)?.getDetail()}
+production ${this.owner.has(ProductionComponent) ? '\n' + this.owner.get(ProductionComponent)?.getDetail() : '-'}
 cargo ${this.getCargoDetailsWithPrices()}`;
     }
 

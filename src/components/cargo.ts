@@ -15,6 +15,7 @@ export class CargoComponent extends ex.Component {
     }
 
     addItem(item: Wares, amount: number) {
+        ex.assert(`Cargo item ${item} not in resource filter: ${this.resourceFilter.join(', ')}`, () => !this.resourceFilter || this.resourceFilter.includes(item));
         this.items[item] = (this.items[item] || 0) + amount;
         this.volume += WaresData[item].volume * amount;
         ex.assert(`Cargo volume exceeded max volume: ${this.volume} > ${this.maxVolume}`, () => this.volume <= this.maxVolume);

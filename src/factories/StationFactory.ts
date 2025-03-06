@@ -9,6 +9,7 @@ import { MyLevel } from "../scenes/level";
 import { Resources } from "../resources";
 import { StationConfig } from "../data/stations";
 import { ProductionComponent } from "../components/production";
+import { Wares } from "../data/wares";
 
 export class StationFactory {
     constructor(
@@ -36,7 +37,13 @@ export class StationFactory {
     private addComponents(station: StaticSpaceObject, config: StationConfig) {
         const cargo = config.components?.cargo;
         if (cargo) {
-            station.addComponent(new CargoComponent(cargo.maxVolume, cargo.resourceFilter));
+            const cargoComponent = new CargoComponent(cargo.maxVolume, cargo.resourceFilter);
+            if (cargo.startAmount) {
+                for (const [resource, amount] of Object.entries(cargo.startAmount)) {
+                    cargoComponent.addItem(resource as Wares, this.random.integer(amount.min, amount.max));
+                }
+            }
+            station.addComponent(cargoComponent);
         }
         const wallet = config.components?.wallet;
         if (wallet) {
@@ -45,7 +52,14 @@ export class StationFactory {
         station.addComponent(new StationComponent(this.random));
         const production = config.components?.production;
         if (production) {
-            station.addComponent(new ProductionComponent(this.scene, production));
+            const productionComponent = new ProductionComponent(this.scene, production.jobs);
+            station.addComponent(productionComponent);
+            if (production.startJobs) {
+                for (const job of productionComponent.productionJobs) {
+                    job.running = true;
+                    job.timeRemaining = this.random.integer(job.jobType.cycleTime * 0.1, job.jobType.cycleTime * 0.9);
+                }
+            }
         }
     }
 

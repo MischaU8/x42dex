@@ -10,12 +10,12 @@ export class StaticSpaceObject extends ex.Actor {
 
   image: ex.ImageSource;
   motionSystem!: PausableMotionSystem;
-  constructor(name: string, image: ex.ImageSource, color: ex.Color, pos: ex.Vector) {
+  constructor(name: string, image: ex.ImageSource, color: ex.Color, pos: ex.Vector, width: number, height: number) {
     super({
       name,
       pos,
-      width: Config.StaticSpaceObjectWidth,
-      height: Config.StaticSpaceObjectHeight,
+      width,
+      height,
       color,
       z: 5,
     });
@@ -26,8 +26,8 @@ export class StaticSpaceObject extends ex.Actor {
     this.motionSystem = engine.currentScene.world.get(PausableMotionSystem) as PausableMotionSystem;
 
     this.graphics.add(this.image.toSprite({destSize: {
-      width: Config.StaticSpaceObjectWidth,
-      height: Config.StaticSpaceObjectHeight,
+      width: this.width,
+      height: this.height,
     }}));
 
     const material = engine.graphicsContext.createMaterial({

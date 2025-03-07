@@ -10,6 +10,7 @@ import { Resources } from "../resources";
 import { StationConfig } from "../data/stations";
 import { ProductionComponent } from "../components/production";
 import { Wares } from "../data/wares";
+import { Config } from "../config";
 
 export class StationFactory {
     constructor(
@@ -25,7 +26,9 @@ export class StationFactory {
             `${config.name} ${config.index}`,
             stationImage,
             stationColor,
-            ex.Vector.Zero
+            ex.Vector.Zero,
+            Config.StationWidth,
+            Config.StationHeight,
         );
 
         this.addComponents(station, config);

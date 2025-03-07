@@ -12,8 +12,8 @@ export const Config = {
     MapSize: 48,
     MapPadding: 1,
 
-    FogOfWar: false,
-    Background: false,
+    FogOfWar: true,
+    Background: true,
     DrawSensors: false,
 
     FontSize: 20,
@@ -25,8 +25,10 @@ export const Config = {
 
     NumAstroids: Math.floor(25 * worldSize * worldSize),
 
-    StaticSpaceObjectWidth: 32,
-    StaticSpaceObjectHeight: 32,
+    AstroidWidth: 32,
+    AstroidHeight: 32,
+    StationWidth: 64,
+    StationHeight: 64,
     ShipWidth: 16,
     ShipHeight: 16,
 

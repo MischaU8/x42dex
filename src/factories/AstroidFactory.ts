@@ -6,6 +6,7 @@ import { MinableComponent } from "../components/minable";
 import { MyLevel } from "../scenes/level";
 import { AstroidTypes, AstroidTypeKey } from "../data/astroids";
 import { Wares } from "../data/wares";
+import { Config } from "../config";
 
 export interface AstroidConfig {
     name: string;
@@ -27,7 +28,9 @@ export class AstroidFactory {
             `${astroidType.name} Astroid #${config.index}`,
             astroidType.image,
             astroidType.color,
-            ex.Vector.Zero
+            ex.Vector.Zero,
+            Config.AstroidWidth,
+            Config.AstroidHeight,
         );
 
         this.addComponents(astroid, typeKey, astroidType);

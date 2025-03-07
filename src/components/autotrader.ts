@@ -88,7 +88,7 @@ export class AutotraderComponent extends ex.Component {
     }
 
     getDetails(): string {
-        return `${this.machine.currentState.name} ${this.rangeMultiplier > 0 ? `(range ${this.rangeMultiplier}x)` : ''}`;
+        return `${this.machine.currentState.name} ${this.rangeMultiplier > 0 ? `(range ${this.rangeMultiplier}x)` : ''} ${this.tradeProduct ? `(${this.tradeProduct})` : ''}`;
     }
 
     onIdleUpdate(_data: unknown, elapsed: number) {
@@ -147,7 +147,11 @@ export class AutotraderComponent extends ex.Component {
         }
         const candidates = this.getNearbySellers();
         if (candidates.length === 0) {
-            this.rangeMultiplier = Math.min(this.rangeMultiplier * 2, Config.MaxRangeMultiplier);
+            if (this.rangeMultiplier < Config.MaxRangeMultiplier) {
+                this.rangeMultiplier = Math.min(this.rangeMultiplier * 2, Config.MaxRangeMultiplier);
+            } else {
+                this.machine.go('IDLE');
+            }
             return;
         }
         this.target = this.getBestSeller(candidates);

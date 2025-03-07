@@ -12,7 +12,7 @@ export const Config = {
     MapSize: 48,
     MapPadding: 1,
 
-    FogOfWar: true,
+    FogOfWar: false,
     Background: false,
     DrawSensors: false,
 
@@ -21,7 +21,7 @@ export const Config = {
     ZoomWheelFactor: 1.05,
     MinZoom: 0.35,
     MaxZoom: 2.0,
-    MinShipVisibilityZoom: 0.5,
+    MinShipVisibilityZoom: 0.35,
 
     NumAstroids: Math.floor(25 * worldSize * worldSize),
 

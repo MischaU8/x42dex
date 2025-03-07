@@ -7,7 +7,7 @@ import { Config } from "./config";
 // Goal is to keep main.ts small and just enough to configure the engine
 
 const game = new ex.Engine({
-  backgroundColor: ex.Color.Black,
+  backgroundColor: ex.Color.fromHex('#111111'),
   canvasElementId: 'game',
   displayMode: ex.DisplayMode.FillScreen, // Display mode tells excalibur how to fill the window
   pointerScope: ex.PointerScope.Document,

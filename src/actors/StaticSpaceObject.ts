@@ -1,6 +1,5 @@
 import * as ex from "excalibur";
 import { ColorizeGLSL } from "../materials";
-import { Config } from "../config";
 import * as gev from "../gameevents";
 import { PausableMotionSystem } from "../systems/PausableMotionSystem";
 

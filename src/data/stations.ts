@@ -32,6 +32,12 @@ export interface StationConfig {
     index?: number;
 }
 
+const DefaultProductionConfig: ProductionConfig = {
+    jobs: {},
+    startJobs: true,
+    startCargo: true,
+}
+
 export const DefaultStationConfigs: StationConfig[] = [
     {
         name: 'Advanced Composites Factory',
@@ -45,11 +51,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.graphene, Wares.refinedmetals, Wares.advancedcomposites],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.advancedcomposites]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -68,11 +73,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.hydrogen, Wares.antimattercells],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.antimattercells]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -91,11 +95,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.antimattercells, Wares.energycells, Wares.refinedmetals, Wares.engineparts],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.engineparts]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -114,11 +117,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.methane, Wares.graphene],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.graphene]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -137,11 +139,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.graphene, Wares.refinedmetals, Wares.hullparts],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.hullparts]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -160,11 +161,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.ice, Wares.water],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.water]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -183,11 +183,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.siliconwafers, Wares.microchips],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.microchips]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -206,11 +205,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.ore, Wares.refinedmetals],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.refinedmetals]: 2
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -229,11 +227,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.graphene, Wares.superfluidcoolant, Wares.plasmaconductors],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.plasmaconductors]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -252,11 +249,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.graphene, Wares.superfluidcoolant, Wares.quantumtubes],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.quantumtubes]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -275,11 +271,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.refinedmetals, Wares.siliconwafers, Wares.scanningarrays],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.scanningarrays]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -298,11 +293,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.silicon, Wares.siliconwafers],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.siliconwafers]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -321,11 +315,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.siliconwafers, Wares.smartchips],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.smartchips]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000
@@ -344,11 +337,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.energycells]: 2
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 0
@@ -367,11 +359,10 @@ export const DefaultStationConfigs: StationConfig[] = [
                 resourceFilter: [Wares.energycells, Wares.helium, Wares.superfluidcoolant],
             },
             production: {
+                ...DefaultProductionConfig,
                 jobs: {
                     [Wares.superfluidcoolant]: 1
                 },
-                startJobs: true,
-                startCargo: true,
             },
             wallet: {
                 initialBalance: 250_000

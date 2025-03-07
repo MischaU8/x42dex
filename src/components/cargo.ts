@@ -47,4 +47,9 @@ export class CargoComponent extends ex.Component {
         }
         return details;
     }
+
+    getSummary(): string {
+        const filled = (this.volume / this.maxVolume) * 100;
+        return `${filled.toFixed(0).padStart(3, " ")}% 📦`;
+    }
 }

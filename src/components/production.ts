@@ -92,6 +92,12 @@ export class ProductionComponent extends ex.Component {
         return this.productionJobs.map(job => `${job.jobType.output.padStart(16, " ")} ${job.running ? `${Math.floor(job.timeRemaining)}/${job.jobType.cycleTime}s` : 'idle'}`).join('\n');
     }
 
+    getSummary(): string {
+        const running = this.productionJobs.filter(job => job.running).length;
+        const idle = this.productionJobs.filter(job => !job.running).length;
+        return `${running ? running + '⚡' : ''}${idle ? idle + '⊘' : ''}`;
+    }
+
     private updateProductionJobs(delta: number) {
         for (const job of this.productionJobs) {
             if (job.running) {

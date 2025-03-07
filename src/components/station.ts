@@ -34,6 +34,15 @@ production ${this.owner.has(ProductionComponent) ? '\n' + this.owner.get(Product
 cargo ${this.getCargoDetailsWithPrices()}`;
     }
 
+    getSummary(): string {
+        const wallet = this.owner.get(WalletComponent)?.getSummary() || '-';
+        const production = this.owner.has(ProductionComponent)
+            ? this.owner.get(ProductionComponent)?.getSummary()
+            : '-';
+        const cargo = this.owner.get(CargoComponent)?.getSummary() || '-';
+        return `${this.owner.name.padStart(29, " ")} ${production.padStart(4, " ")} ${wallet.padStart(8, " ")} ${cargo}`;
+    }
+
     getPriceQuote(item: Wares): number {
         const production = this.owner.get(ProductionComponent);
         const cargo = this.owner.get(CargoComponent);

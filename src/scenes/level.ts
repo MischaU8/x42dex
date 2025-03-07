@@ -4,6 +4,7 @@ import { Config } from "../config";
 import { Resources } from "../resources";
 
 import { ActorDetailsPanel } from "../hud/ActorDetailsPanel";
+import { StationListPanel } from "../hud/StationListPanel";
 import { Background } from "../actors/background";
 
 import { Map } from "../actors/map";
@@ -41,7 +42,7 @@ export class MyLevel extends ex.Scene {
         })
     });
     actorDetails = new ActorDetailsPanel();
-
+    stationList = new StationListPanel();
     private shipFactory!: ShipFactory;
     private stationFactory!: StationFactory;
     private astroidFactory!: AstroidFactory;
@@ -61,6 +62,7 @@ export class MyLevel extends ex.Scene {
         this.add(this.map);
         this.add(this.statusLabel);
         this.add(this.actorDetails);
+        this.add(this.stationList);
         this.spawnStations();
         this.spawnAstroids();
         this.spawnShips(engine);
@@ -68,6 +70,7 @@ export class MyLevel extends ex.Scene {
         this.cursor = new Cursor('cursor', this.player);
         this.add(this.cursor);
         this.actorDetails.setTarget(this.player);
+        this.stationList.setList(this.staticObjects);
 
         this.registerEvents(engine);
     }
@@ -124,6 +127,8 @@ export class MyLevel extends ex.Scene {
                 // select and focus on player ship
                 this.engine.currentScene.camera.pos = this.player.pos;
                 this.onSelectShip(this.player);
+            } else if (evt.key === ex.Keys.Key1) {
+                this.stationList.isVisible = !this.stationList.isVisible;
             }
         });
     }

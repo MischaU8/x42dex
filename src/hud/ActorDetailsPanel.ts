@@ -20,7 +20,6 @@ export class ActorDetailsPanel extends ex.Label {
     }
 
     onAdd() {
-        ui!.classList.add('GameScene')
         this.divInfo = document.createElement('div')
         this.divInfo.className = 'ActorDetailsPanel'
         this.divInfo.innerHTML = '[Info]'
@@ -30,8 +29,7 @@ export class ActorDetailsPanel extends ex.Label {
     onRemove() {
         // Ensure we cleanup the DOM and remove any children when transitioning scenes
         this.divInfo?.remove()
-        ui!.classList.remove('GameScene')
-        ui!.innerHTML = ''
+        // ui!.innerHTML = ''
     }
 
     setTarget(target: ex.Actor) {

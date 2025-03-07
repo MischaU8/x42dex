@@ -4,6 +4,8 @@ import { Wares} from '../data/wares';
 import { ProductionJob, ProductionJobs } from '../data/productionjobs';
 import { StaticSpaceObject } from '../actors/StaticSpaceObject';
 import { MyLevel } from '../scenes/level';
+import { ProductionConfig } from '../data/stations';
+import { Config } from '../config';
 
 
 type ProductionJobData = {
@@ -18,9 +20,9 @@ export class ProductionComponent extends ex.Component {
     hourlyResources: { [key in Wares]: number };
 
     private level: MyLevel;
-    private config: { [key in Wares]?: number };
+    private config: ProductionConfig;
 
-    constructor(level: MyLevel, config: { [key in Wares]?: number }) {
+    constructor(level: MyLevel, config: ProductionConfig) {
         super();
         this.productionJobs = [] as ProductionJobData[];
         this.hourlyResources = {} as { [key in Wares]: number };
@@ -29,7 +31,7 @@ export class ProductionComponent extends ex.Component {
     }
 
     initJobs() {
-        for (const [jobType, size] of Object.entries(this.config)) {
+        for (const [jobType, size] of Object.entries(this.config.jobs)) {
             if (!ProductionJobs[jobType as Wares]) {
                 throw new Error(`Production job ${jobType} not found`);
             }
@@ -50,6 +52,19 @@ export class ProductionComponent extends ex.Component {
                 ex.assert(`Production job input  ${input} not in resource filter: ${cargo.resourceFilter.join(', ')}`, () => cargo.resourceFilter.includes(input as Wares));
                 const consumption = size * amount * cyclesPerHour;
                 this.hourlyResources[input as Wares] = (this.hourlyResources[input as Wares] || 0) - consumption;
+            }
+        }
+        if (this.config.startJobs) {
+            for (const job of this.productionJobs) {
+                job.running = true;
+                job.timeRemaining = this.level.random.integer(job.jobType.cycleTime * 0.1, job.jobType.cycleTime * 0.9);
+            }
+        }
+        if (this.config.startCargo) {
+            const cargo = this.owner.get(CargoComponent);
+            for (const [resource, amount] of Object.entries(this.hourlyResources)) {
+                const stock = this.level.random.integer(0, Math.abs(amount) * Config.MaxHoursOfStock);
+                cargo.addItem(resource as Wares, stock);
             }
         }
     }

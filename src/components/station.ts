@@ -3,6 +3,7 @@ import { CargoComponent } from './cargo';
 import { WalletComponent } from './wallet';
 import { Wares, WaresData } from '../data/wares';
 import { ProductionComponent } from './production';
+import { Config } from '../config';
 
 export class StationComponent extends ex.Component {
     declare owner: ex.Actor
@@ -43,7 +44,7 @@ cargo ${this.getCargoDetailsWithPrices()}`;
         const hourlyRate = production.hourlyResources[item] || 0;
         if (hourlyRate === 0) return 0;
 
-        const fulfillment = stock / Math.abs(hourlyRate);
+        const fulfillment = stock / Math.abs(hourlyRate * Config.MaxHoursOfStock);
         const minPrice = WaresData[item].minPrice;
         const maxPrice = WaresData[item].maxPrice;
         const priceRange = maxPrice - minPrice;
@@ -62,7 +63,7 @@ cargo ${this.getCargoDetailsWithPrices()}`;
             return 0;
         }
         const stock = cargo.items[item] || 0;
-        const targetStock = Math.abs(hourlyRate);
+        const targetStock = Math.abs(hourlyRate) * Config.MaxHoursOfStock;
         const shortage = Math.max(0, targetStock - stock);
         const wallet = this.owner.get(WalletComponent);
         const price = this.getPriceQuote(item);
@@ -82,7 +83,7 @@ cargo ${this.getCargoDetailsWithPrices()}`;
         }
         const hourlyRate = production.hourlyResources[item] || 0;
         if (hourlyRate < 0) {
-            const targetStock = Math.abs(hourlyRate);
+            const targetStock = Math.abs(hourlyRate) * Config.MaxHoursOfStock;
             if (stock > targetStock) {
                 return Math.floor(stock - targetStock);
             } else {

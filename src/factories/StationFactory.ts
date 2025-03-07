@@ -55,14 +55,8 @@ export class StationFactory {
         station.addComponent(new StationComponent());
         const production = config.components?.production;
         if (production) {
-            const productionComponent = new ProductionComponent(this.scene, production.jobs);
+            const productionComponent = new ProductionComponent(this.scene, production);
             station.addComponent(productionComponent);
-            if (production.startJobs) {
-                for (const job of productionComponent.productionJobs) {
-                    job.running = true;
-                    job.timeRemaining = this.random.integer(job.jobType.cycleTime * 0.1, job.jobType.cycleTime * 0.9);
-                }
-            }
         }
     }
 

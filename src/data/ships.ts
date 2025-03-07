@@ -144,7 +144,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
     {
         name: 'Energy Trader',
         role: 'transport',
-        count: 20,
+        count: 10,
         possibleImages: [Resources.ShipH],
         possibleColors: [ex.Color.Yellow],
         components: {
@@ -158,7 +158,7 @@ export const DefaultShipConfigs: ShipConfig[] = [
             autotrader: {
                 tradeFilter: Energy,
                 topNBuyers: 3,
-                topNSellers: 1,
+                topNSellers: 2,
                 initialRangeMultiplier: 16
             }
         }

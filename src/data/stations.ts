@@ -224,7 +224,7 @@ export const DefaultStationConfigs: StationConfig[] = [
     {
         name: 'Ore Refinery',
         type: 'production',
-        count: 3,
+        count: 6,
         possibleImages: [Resources.StationC],
         possibleColors: [ex.Color.Brown],
         components: {
@@ -239,7 +239,7 @@ export const DefaultStationConfigs: StationConfig[] = [
             },
             production: {
                 jobs: {
-                    [Wares.refinedmetals]: 1
+                    [Wares.refinedmetals]: 2
                 },
                 startJobs: true,
             },

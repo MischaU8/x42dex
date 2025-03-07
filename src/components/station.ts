@@ -6,7 +6,7 @@ import { ProductionComponent } from './production';
 
 export class StationComponent extends ex.Component {
     declare owner: ex.Actor
-    unloadAmount: number = 1000;
+    unloadAmount: number = 100;
 
     // initializeBasePrices() {
     //     // Set random prices for all wares in our cargo filter

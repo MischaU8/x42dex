@@ -6,30 +6,25 @@ import { ProductionComponent } from './production';
 
 export class StationComponent extends ex.Component {
     declare owner: ex.Actor
-    itemPrices: { [key in Wares]: number }
     unloadAmount: number = 1000;
 
-    private random: ex.Random;
+    // initializeBasePrices() {
+    //     // Set random prices for all wares in our cargo filter
+    //     const resourceFilter = this.owner.get(CargoComponent)?.resourceFilter;
+    //     for (const [key, value] of Object.entries(WaresData)) {
+    //         if (resourceFilter && resourceFilter.includes(key as Wares)) {
+    //             this.tickerItems[key as Wares] = {
+    //                 ware: key as Wares,
+    //                 price: this.random.integer(value.minPrice, value.maxPrice),
+    //                 maxStock: this.random.integer(value.minStock, value.maxStock)
+    //             };
+    //         }
+    //     }
+    // }
 
-    constructor(random: ex.Random) {
-        super();
-        this.random = random;
-        this.itemPrices = {} as { [key in Wares]: number };
-    }
-
-    initializeBasePrices() {
-        // Set random prices for all wares in our cargo filter
-        const resourceFilter = this.owner.get(CargoComponent)?.resourceFilter;
-        for (const [key, value] of Object.entries(WaresData)) {
-            if (resourceFilter && resourceFilter.includes(key as Wares)) {
-                this.itemPrices[key as Wares] = this.random.integer(value.minPrice, value.maxPrice);
-            }
-        }
-    }
-
-    onAdd(owner: ex.Actor): void {
-        this.initializeBasePrices();
-    }
+    // onAdd(owner: ex.Actor): void {
+    //     this.initializeBasePrices();
+    // }
 
     getDetails(): string {
         return `[${this.owner.name}]
@@ -38,14 +33,71 @@ production ${this.owner.has(ProductionComponent) ? '\n' + this.owner.get(Product
 cargo ${this.getCargoDetailsWithPrices()}`;
     }
 
-    getPriceQuote(item: Wares, _amount: number): number {
-        return this.itemPrices[item];
+    getPriceQuote(item: Wares): number {
+        const production = this.owner.get(ProductionComponent);
+        const cargo = this.owner.get(CargoComponent);
+        if (!production || !cargo) {
+            return 0;
+        }
+        const stock = cargo.items[item] || 0;
+        const hourlyRate = production.hourlyResources[item] || 0;
+        if (hourlyRate === 0) return 0;
+
+        const fulfillment = stock / Math.abs(hourlyRate);
+        const minPrice = WaresData[item].minPrice;
+        const maxPrice = WaresData[item].maxPrice;
+        const priceRange = maxPrice - minPrice;
+        return ex.clamp(minPrice + priceRange * (1 - fulfillment), minPrice, maxPrice);
+    }
+
+    calcMaxBuyAmount(item: Wares): number {
+        const cargo = this.owner.get(CargoComponent);
+        const targetSpace = cargo.getAvailableSpaceFor(item);
+        const production = this.owner.get(ProductionComponent);
+        if (!production) {
+            return 0; // TODO
+        }
+        const hourlyRate = production.hourlyResources[item] || 0;
+        if (hourlyRate >= 0) {
+            return 0;
+        }
+        const stock = cargo.items[item] || 0;
+        const targetStock = Math.abs(hourlyRate);
+        const shortage = Math.max(0, targetStock - stock);
+        const wallet = this.owner.get(WalletComponent);
+        const price = this.getPriceQuote(item);
+        const canAfford = wallet.balance / price;
+        return Math.floor(Math.min(targetSpace, canAfford, shortage));
+    }
+
+    calcMaxSellAmount(item: Wares): number {
+        const cargo = this.owner.get(CargoComponent);
+        const stock = cargo.items[item] || 0;
+        if (stock === 0) {
+            return 0;
+        }
+        const production = this.owner.get(ProductionComponent);
+        if (!production) {
+            return 0; // TODO
+        }
+        const hourlyRate = production.hourlyResources[item] || 0;
+        if (hourlyRate < 0) {
+            const targetStock = Math.abs(hourlyRate);
+            if (stock > targetStock) {
+                return Math.floor(stock - targetStock);
+            } else {
+                return 0;
+            }
+        } else {
+            return stock;
+        }
     }
 
     getCargoDetailsWithPrices(): string {
         const cargo = this.owner.get(CargoComponent);
         let details = `${cargo.volume.toFixed(0)}/${cargo.maxVolume.toFixed(0)}m³`;
-        const prices = Object.entries(this.itemPrices).map(([item, price]) => `${item.padStart(16, " ")} ${cargo.items[item as Wares] || 0}x ¢${price.toFixed(0)}`);
+        const resourceFilter = this.owner.get(CargoComponent)?.resourceFilter
+        const prices = resourceFilter.map(item => `${item.padStart(16, " ")} ${cargo.items[item as Wares] || 0}x ¢${this.getPriceQuote(item as Wares).toFixed(0)} hourly ${this.owner.get(ProductionComponent)?.hourlyResources[item as Wares] || 0} buy ${this.calcMaxBuyAmount(item as Wares)} sell ${this.calcMaxSellAmount(item as Wares)}`);
         details += `\n${prices.join('\n')}`;
         return details;
     }
@@ -61,16 +113,25 @@ cargo ${this.getCargoDetailsWithPrices()}`;
         sourceWallet.balance += amount * price;
     }
 
-    calcMaxBuyAmount(item: Wares): number {
-        const targetCargo = this.owner.get(CargoComponent);
-        const targetSpace = targetCargo.getAvailableSpaceFor(item);
-        const targetWallet = this.owner.get(WalletComponent);
-        const price = this.getPriceQuote(item, 1);  // TODO fixed amount!
-        const targetCanAfford = targetWallet.balance / price;
-        return Math.floor(Math.min(targetSpace, targetCanAfford));
+    sellAllCargoToStation(source: ex.Actor, target: ex.Actor, filter: Wares[], elapsed: number): boolean {
+        const sourceCargo = source.get(CargoComponent);
+        for (const [item, amount] of Object.entries(sourceCargo.items) as [Wares, number][]) {
+            if (!filter.includes(item as Wares)) {
+                continue;
+            }
+            const price = this.getPriceQuote(item);
+            const sourceTransferAmount = Math.min(this.unloadAmount * elapsed / 1000, amount);
+            const targetTransferAmount = this.calcMaxBuyAmount(item);
+            const transferAmount = Math.floor(Math.min(sourceTransferAmount, targetTransferAmount));
+            if (transferAmount > 0) {
+                this.tradeCargo(source, target, item, transferAmount, price);
+                return true;
+            }
+        }
+        return false;
     }
 
-    tradeAllCargo(source: ex.Actor, target: ex.Actor, filter: Wares[], elapsed: number): boolean {
+    buyAllCargoFromStation(source: ex.Actor, target: ex.Actor, filter: Wares[], elapsed: number): boolean {
         const targetCargo = target.get(CargoComponent);
         const targetWallet = target.get(WalletComponent);
         const sourceCargo = source.get(CargoComponent);
@@ -78,11 +139,11 @@ cargo ${this.getCargoDetailsWithPrices()}`;
             if (!filter.includes(item as Wares)) {
                 continue;
             }
-            const price = this.getPriceQuote(item, amount);
-            const sourceTransferAmount = Math.min(this.unloadAmount * elapsed / 1000, amount);
+            const price = this.getPriceQuote(item);
+            const sourceTransferAmount = Math.min(this.unloadAmount * elapsed / 1000, amount, this.calcMaxSellAmount(item));
             const targetSpace = targetCargo.getAvailableSpaceFor(item);
-            const targetCanAffordCanAfford = targetWallet.balance / price;
-            const targetTransferAmount = Math.floor(Math.min(targetSpace, targetCanAffordCanAfford));
+            const targetCanAfford = targetWallet.balance / price;
+            const targetTransferAmount = Math.floor(Math.min(targetSpace, targetCanAfford));
             const transferAmount = Math.floor(Math.min(sourceTransferAmount, targetTransferAmount));
             if (transferAmount > 0) {
                 this.tradeCargo(source, target, item, transferAmount, price);

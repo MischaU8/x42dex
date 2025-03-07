@@ -15,29 +15,47 @@ type ProductionJobData = {
 export class ProductionComponent extends ex.Component {
     declare owner: StaticSpaceObject;
     productionJobs: ProductionJobData[]
+    hourlyResources: { [key in Wares]: number };
 
     private level: MyLevel;
+    private config: { [key in Wares]?: number };
 
     constructor(level: MyLevel, config: { [key in Wares]?: number }) {
         super();
         this.productionJobs = [] as ProductionJobData[];
+        this.hourlyResources = {} as { [key in Wares]: number };
         this.level = level;
+        this.config = config;
+    }
 
-        for (const [jobType, size] of Object.entries(config)) {
+    initJobs() {
+        for (const [jobType, size] of Object.entries(this.config)) {
             if (!ProductionJobs[jobType as Wares]) {
                 throw new Error(`Production job ${jobType} not found`);
             }
+            const job = ProductionJobs[jobType as Wares]!;
             for (let i = 0; i < size; i++) {
                 this.productionJobs.push({
-                    jobType: ProductionJobs[jobType as Wares]!,
+                    jobType: job,
                     running: false,
                     timeRemaining: 0,
                 })
+            }
+            const cargo = this.owner.get(CargoComponent);
+            ex.assert(`Production job output ${job.output} not in resource filter: ${cargo.resourceFilter.join(', ')}`, () => cargo.resourceFilter.includes(job.output));
+            const cyclesPerHour = 3600 / job.cycleTime;
+            const production = size * job.batchSize * cyclesPerHour;
+            this.hourlyResources[job.output] = (this.hourlyResources[job.output] || 0) + production;
+            for (const [input, amount] of Object.entries(job.input)) {
+                ex.assert(`Production job input  ${input} not in resource filter: ${cargo.resourceFilter.join(', ')}`, () => cargo.resourceFilter.includes(input as Wares));
+                const consumption = size * amount * cyclesPerHour;
+                this.hourlyResources[input as Wares] = (this.hourlyResources[input as Wares] || 0) - consumption;
             }
         }
     }
 
     onAdd(owner: ex.Actor): void {
+        this.initJobs();
         const timer = new ex.Timer({
             action: () => {
                 if (this.owner.motionSystem.paused) {

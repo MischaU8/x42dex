@@ -157,8 +157,8 @@ export const DefaultShipConfigs: ShipConfig[] = [
             autopilot: true,
             autotrader: {
                 tradeFilter: Energy,
-                topNBuyers: 2,
-                topNSellers: 2,
+                topNBuyers: 3,
+                topNSellers: 1,
                 initialRangeMultiplier: 16
             }
         }

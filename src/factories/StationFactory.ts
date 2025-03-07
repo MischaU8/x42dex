@@ -49,7 +49,7 @@ export class StationFactory {
         if (wallet) {
             station.addComponent(new WalletComponent(wallet.initialBalance));
         }
-        station.addComponent(new StationComponent(this.random));
+        station.addComponent(new StationComponent());
         const production = config.components?.production;
         if (production) {
             const productionComponent = new ProductionComponent(this.scene, production.jobs);

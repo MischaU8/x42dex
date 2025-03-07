@@ -180,7 +180,7 @@ export class AutominerComponent extends ex.Component {
             obj => obj.has(StationComponent)
             && !this.excludeTargets.includes(obj)
             && this.owner.pos.distance(obj.pos) <= maxRange
-            && Object.keys(shipCargo.items).some(item => obj.get(StationComponent)?.itemPrices[item as Wares] > 0 && obj.get(StationComponent)?.calcMaxBuyAmount(item as Wares) > 0));
+            && Object.keys(shipCargo.items).some(item => obj.get(StationComponent)?.getPriceQuote(item as Wares) > 0 && obj.get(StationComponent)?.calcMaxBuyAmount(item as Wares) > 0));
     }
 
     getNearbyStaticObject(candidates: StaticSpaceObject[], topN: number = 1): StaticSpaceObject {
@@ -237,8 +237,8 @@ export class AutominerComponent extends ex.Component {
         }
         // console.log(this.owner.name, 'deliver cargo', elapsed);
         const station = this.target.get(StationComponent);
-        const cargo = this.owner.get(CargoComponent);
-        const hasTraded = station.tradeAllCargo(this.owner, this.target, cargo.resourceFilter,elapsed);
+        const stationCargo = this.target.get(CargoComponent);
+        const hasTraded = station.sellAllCargoToStation(this.owner, this.target, stationCargo.resourceFilter, elapsed);
         if (!hasTraded) {
             this.machine.go('IDLE');
         }

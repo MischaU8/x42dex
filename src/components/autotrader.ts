@@ -122,8 +122,8 @@ export class AutotraderComponent extends ex.Component {
             obj => obj.has(StationComponent)
             && !this.excludeTargets.includes(obj)
             && this.owner.pos.distance(obj.pos) <= maxRange
-            && obj.get(CargoComponent)?.items[this.tradeProduct as Wares] > 0
-            && obj.get(StationComponent)?.itemPrices[this.tradeProduct as Wares] > 0);
+            && obj.get(StationComponent)?.calcMaxSellAmount(this.tradeProduct as Wares) > 0
+            && obj.get(StationComponent)?.getPriceQuote(this.tradeProduct as Wares) > 0);
     }
 
     getNearbyBuyers(): StaticSpaceObject[] {
@@ -133,12 +133,12 @@ export class AutotraderComponent extends ex.Component {
             && !this.excludeTargets.includes(obj)
             && this.owner.pos.distance(obj.pos) <= maxRange
             && obj.get(StationComponent)?.calcMaxBuyAmount(this.tradeProduct as Wares)
-            && obj.get(StationComponent)?.itemPrices[this.tradeProduct as Wares] > 0);
+            && obj.get(StationComponent)?.getPriceQuote(this.tradeProduct as Wares) > 0);
     }
 
     onFindSellerUpdate(_data: unknown, elapsed: number) {
         if (this.target) {
-            if (!this.target.get(CargoComponent)?.items[this.tradeProduct as Wares]) {
+            if (!this.target.get(StationComponent)?.calcMaxSellAmount(this.tradeProduct as Wares)) {
                 this.owner.orderCoast();
                 this.onFindStationEnter();
             } else {
@@ -182,7 +182,7 @@ export class AutotraderComponent extends ex.Component {
     }
 
     sortByPrice(candidates: StaticSpaceObject[]): StaticSpaceObject[] {
-        return candidates.sort((a, b) => a.get(StationComponent)?.itemPrices[this.tradeProduct as Wares] - b.get(StationComponent)?.itemPrices[this.tradeProduct as Wares]);
+        return candidates.sort((a, b) => a.get(StationComponent)?.getPriceQuote(this.tradeProduct as Wares) - b.get(StationComponent)?.getPriceQuote(this.tradeProduct as Wares));
     }
 
     getBestBuyer(candidates: StaticSpaceObject[]): StaticSpaceObject | null {
@@ -223,7 +223,7 @@ export class AutotraderComponent extends ex.Component {
             return;
         }
         const station = this.target.get(StationComponent);
-        const hasTraded = station.tradeAllCargo(this.target, this.owner, this.tradeFilter, elapsed);
+        const hasTraded = station.buyAllCargoFromStation(this.target, this.owner, this.tradeFilter, elapsed);
         if (!hasTraded) {
             this.machine.go('IDLE');
         }
@@ -236,7 +236,8 @@ export class AutotraderComponent extends ex.Component {
         }
         // console.log(this.owner.name, 'deliver cargo', elapsed);
         const station = this.target.get(StationComponent);
-        const hasTraded = station.tradeAllCargo(this.owner, this.target, this.tradeFilter, elapsed);
+        const stationCargo = this.target.get(CargoComponent);
+        const hasTraded = station.sellAllCargoToStation(this.owner, this.target, stationCargo.resourceFilter, elapsed);
         if (!hasTraded) {
             this.machine.go('IDLE');
         }

@@ -20,7 +20,7 @@ export enum Wares {
     missilecomponents = 'missilecomponents',
     shieldcomponents = 'shieldcomponents',
     smartchips = 'smartchips',
-    turrentcomponents = 'turrentcomponents',
+    turretcomponents = 'turretcomponents',
     weaponcomponents = 'weaponcomponents',
     advancedcomposites = 'advancedcomposites',
     engineparts = 'engineparts',
@@ -269,7 +269,7 @@ export const WaresData = {
         maxPrice: 211,
         volume: 16,
     },
-    [Wares.turrentcomponents]: {
+    [Wares.turretcomponents]: {
         name: 'Turret Components',
         type: WaresType.shiptech,
         minPrice: 164,

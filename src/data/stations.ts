@@ -21,7 +21,7 @@ export interface StationConfig {
             jobs: Partial<{ [key in Wares]: number }>;
             startJobs?: boolean;
         };
-        wallet?: {
+        wallet: {
             initialBalance?: number;
         };
     };
@@ -277,6 +277,62 @@ export const DefaultStationConfigs: StationConfig[] = [
         }
     },
     {
+        name: 'Quantum Tubes Factory',
+        type: 'production',
+        count: 3,
+        possibleImages: [Resources.StationC],
+        possibleColors: [ex.Color.Brown],
+        components: {
+            cargo: {
+                maxVolume: 50_000,
+                resourceFilter: [Wares.energycells, Wares.graphene, Wares.superfluidcoolant, Wares.quantumtubes],
+                startAmount: {
+                    [Wares.energycells]: {min: 40, max: 80},
+                    [Wares.graphene]: {min: 116, max: 232},
+                    [Wares.superfluidcoolant]: {min: 30, max: 60},
+                    [Wares.quantumtubes]: {min: 43, max: 86},
+                },
+            },
+            production: {
+                jobs: {
+                    [Wares.quantumtubes]: 1
+                },
+                startJobs: true,
+            },
+            wallet: {
+                initialBalance: 250_000
+            }
+        }
+    },
+    {
+        name: 'Scanning Arrays Factory',
+        type: 'production',
+        count: 3,
+        possibleImages: [Resources.StationC],
+        possibleColors: [ex.Color.Brown],
+        components: {
+            cargo: {
+                maxVolume: 50_000,
+                resourceFilter: [Wares.energycells, Wares.refinedmetals, Wares.siliconwafers, Wares.scanningarrays],
+                startAmount: {
+                    [Wares.energycells]: {min: 60, max: 120},
+                    [Wares.refinedmetals]: {min: 100, max: 200},
+                    [Wares.siliconwafers]: {min: 60, max: 120},
+                    [Wares.scanningarrays]: {min: 40, max: 80},
+                },
+            },
+            production: {
+                jobs: {
+                    [Wares.scanningarrays]: 1
+                },
+                startJobs: true,
+            },
+            wallet: {
+                initialBalance: 250_000
+            }
+        }
+    },
+    {
         name: 'Silicon Wafer Factory',
         type: 'production',
         count: 3,
@@ -295,6 +351,33 @@ export const DefaultStationConfigs: StationConfig[] = [
             production: {
                 jobs: {
                     [Wares.siliconwafers]: 1
+                },
+                startJobs: true,
+            },
+            wallet: {
+                initialBalance: 250_000
+            }
+        }
+    },
+    {
+        name: 'Smart Chips Factory',
+        type: 'production',
+        count: 3,
+        possibleImages: [Resources.StationC],
+        possibleColors: [ex.Color.Brown],
+        components: {
+            cargo: {
+                maxVolume: 50_000,
+                resourceFilter: [Wares.energycells, Wares.siliconwafers, Wares.smartchips],
+                startAmount: {
+                    [Wares.energycells]: {min: 50, max: 100},
+                    [Wares.siliconwafers]: {min: 20, max: 40},
+                    [Wares.smartchips]: {min: 143, max: 286},
+                },
+            },
+            production: {
+                jobs: {
+                    [Wares.smartchips]: 1
                 },
                 startJobs: true,
             },

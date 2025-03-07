@@ -1,14 +1,31 @@
 import * as ex from "excalibur";
 import { StaticSpaceObject } from "../actors/StaticSpaceObject";
 import { StationComponent } from "../components/station";
+import { MyLevel } from "../scenes/level";
 const ui = document.getElementById('ui')
 
 export class StationListPanel extends ex.Label {
 
     divInfo?: HTMLDivElement;
     list: StaticSpaceObject[] = [];
-    isVisible = true;
+    private _isVisible = true;
     usageTip = '[1] Station List';
+    level: MyLevel;
+
+    constructor(level: MyLevel, stationList: StaticSpaceObject[]) {
+        super();
+        this.list = stationList;
+        this.level = level;
+    }
+
+    get isVisible(): boolean {
+        return this._isVisible;
+    }
+
+    set isVisible(value: boolean) {
+        this._isVisible = value;
+        this.updateText();
+    }
 
     onInitialize(engine: ex.Engine) {
         const timer = new ex.Timer({
@@ -22,7 +39,7 @@ export class StationListPanel extends ex.Label {
 
     onAdd() {
         this.divInfo = document.createElement('div')
-        this.divInfo.className = 'StationListPanel'
+        this.divInfo.className = 'Panel StationListPanel'
         this.divInfo.innerHTML = this.usageTip
         ui?.appendChild(this.divInfo)
     }
@@ -33,21 +50,30 @@ export class StationListPanel extends ex.Label {
         // ui!.innerHTML = ''
     }
 
-    setList(list: StaticSpaceObject[]) {
-        this.list = list.filter(obj => obj.has(StationComponent));
-        this.updateText();
-    }
-
     updateText() {
         if (!this.divInfo) {
             return;
         }
-        let text = ''
         if (this.isVisible) {
-            text += this.list.map(station => `${station.get(StationComponent).getSummary()}`).join('\n')
+            this.divInfo.innerHTML = '';
+            for (const station of this.list.filter(obj => obj.has(StationComponent))) {
+                const button = document.createElement('button');
+                button.id = `station-${station.id}`;
+                button.innerHTML = station.get(StationComponent).getSummary();
+                button.addEventListener('click', evt => {
+                    console.log(`Selected station ${station.id}`);
+                    this.onSelectStation(station);
+                });
+                this.divInfo.appendChild(button);
+                this.divInfo.appendChild(document.createElement('br'));
+            }
         } else {
-            text += this.usageTip
+            this.divInfo!.innerHTML = this.usageTip;
         }
-        this.divInfo!.innerHTML = text.replaceAll('\n', '<br>')
+    }
+
+    onSelectStation(station: StaticSpaceObject) {
+        console.log(`Selected station ${station.id}`);
+        this.level.onSelectStation(station, true);
     }
 }

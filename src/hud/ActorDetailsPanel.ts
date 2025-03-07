@@ -21,7 +21,7 @@ export class ActorDetailsPanel extends ex.Label {
 
     onAdd() {
         this.divInfo = document.createElement('div')
-        this.divInfo.className = 'ActorDetailsPanel'
+        this.divInfo.className = 'Panel ActorDetailsPanel'
         this.divInfo.innerHTML = '[Info]'
         ui?.appendChild(this.divInfo)
     }

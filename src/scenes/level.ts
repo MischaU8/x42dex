@@ -42,7 +42,7 @@ export class MyLevel extends ex.Scene {
         })
     });
     actorDetails = new ActorDetailsPanel();
-    stationList = new StationListPanel();
+    stationList = new StationListPanel(this, this.staticObjects);
     private shipFactory!: ShipFactory;
     private stationFactory!: StationFactory;
     private astroidFactory!: AstroidFactory;
@@ -70,7 +70,6 @@ export class MyLevel extends ex.Scene {
         this.cursor = new Cursor('cursor', this.player);
         this.add(this.cursor);
         this.actorDetails.setTarget(this.player);
-        this.stationList.setList(this.staticObjects);
 
         this.registerEvents(engine);
     }
@@ -112,6 +111,7 @@ export class MyLevel extends ex.Scene {
                 // deselect any target
                 this.deselectAny();
                 this.cursor.target = null;
+                this.stationList.isVisible = false;
             } else if (evt.key === ex.Keys.F) {
                 // toggle following the selected ship
                 if (this.following) {
@@ -235,7 +235,7 @@ export class MyLevel extends ex.Scene {
         }
     }
 
-    onSelectStation(station: StaticSpaceObject) {
+    onSelectStation(station: StaticSpaceObject, focus: boolean = false) {
         this.deselectAny();
         if (this.cursor.target === station) {
             this.cursor.target = null;
@@ -246,6 +246,9 @@ export class MyLevel extends ex.Scene {
             console.log('Selected station', station.name);
             this.setStatusLabel(`Selected ${station.name}`);
             this.actorDetails.setTarget(station);
+            if (focus) {
+                this.engine.currentScene.camera.pos = station.pos;
+            }
         }
     }
 

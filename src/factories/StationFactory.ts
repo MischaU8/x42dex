@@ -23,7 +23,7 @@ export class StationFactory {
         const stationColor = this.random.pickOne(config.possibleColors || [ex.Color.ExcaliburBlue, ex.Color.Teal]);
 
         const station = new StaticSpaceObject(
-            `${config.name} ${config.index}`,
+            `${config.name} ${config.index!+1}`,
             stationImage,
             stationColor,
             ex.Vector.Zero,

@@ -5,6 +5,7 @@ import { Resources } from "../resources";
 
 import { ActorDetailsPanel } from "../hud/ActorDetailsPanel";
 import { StationListPanel } from "../hud/StationListPanel";
+import { GameClockPanel } from "../hud/GameClockPanel";
 import { Background } from "../actors/background";
 
 import { Map } from "../actors/map";
@@ -43,6 +44,7 @@ export class MyLevel extends ex.Scene {
     });
     actorDetails = new ActorDetailsPanel();
     stationList = new StationListPanel(this, this.staticObjects);
+    gameClock = new GameClockPanel();
     private shipFactory!: ShipFactory;
     private stationFactory!: StationFactory;
     private astroidFactory!: AstroidFactory;
@@ -63,6 +65,7 @@ export class MyLevel extends ex.Scene {
         this.add(this.statusLabel);
         this.add(this.actorDetails);
         this.add(this.stationList);
+        this.add(this.gameClock);
         this.spawnStations();
         this.spawnAstroids();
         this.spawnShips(engine);

@@ -12,6 +12,10 @@ export type ProductionConfig = {
     startCargo?: boolean;
 }
 
+export type WalletConfig = {
+    initialBalance?: number;
+}
+
 export interface StationConfig {
     name: string;
     type: StationType;
@@ -25,9 +29,7 @@ export interface StationConfig {
             startAmount?: Partial<{ [key in Wares]: {min: number, max: number} }>;
         };
         production?: ProductionConfig;
-        wallet: {
-            initialBalance?: number;
-        };
+        wallet?: WalletConfig;
     };
     index?: number;
 }
@@ -36,6 +38,10 @@ const DefaultProductionConfig: ProductionConfig = {
     jobs: {},
     startJobs: true,
     startCargo: true,
+}
+
+const DefaultWalletConfig: WalletConfig = {
+    initialBalance: 100_000,
 }
 
 export const DefaultStationConfigs: StationConfig[] = [
@@ -56,9 +62,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.advancedcomposites]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -78,9 +82,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.antimattercells]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -100,9 +102,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.engineparts]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -122,9 +122,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.graphene]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -144,9 +142,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.hullparts]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -166,9 +162,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.water]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -188,9 +182,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.microchips]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -210,9 +202,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.refinedmetals]: 2
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -232,9 +222,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.plasmaconductors]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -254,9 +242,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.quantumtubes]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -276,9 +262,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.scanningarrays]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -298,9 +282,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.siliconwafers]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -320,9 +302,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.smartchips]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -343,7 +323,8 @@ export const DefaultStationConfigs: StationConfig[] = [
                 },
             },
             wallet: {
-                initialBalance: 0
+                ...DefaultWalletConfig,
+                initialBalance: 0,
             }
         }
     },
@@ -364,9 +345,7 @@ export const DefaultStationConfigs: StationConfig[] = [
                     [Wares.superfluidcoolant]: 1
                 },
             },
-            wallet: {
-                initialBalance: 250_000
-            }
+            wallet: DefaultWalletConfig,
         }
     },
     {
@@ -387,7 +366,8 @@ export const DefaultStationConfigs: StationConfig[] = [
                 },
             },
             wallet: {
-                initialBalance: 1_000_000
+                ...DefaultWalletConfig,
+                initialBalance: 1_000_000,
             }
         }
     }
